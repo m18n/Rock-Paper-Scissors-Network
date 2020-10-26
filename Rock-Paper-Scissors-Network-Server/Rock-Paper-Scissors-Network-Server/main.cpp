@@ -4,17 +4,19 @@
 #pragma warning(disable:4996)
 #pragma comment(lib,"ws2_32.lib")
 using namespace std;
-list<SOCKET> conn;
+list<Player> conn;
 struct Player {
 	char login[20];
 	int password = 0;
 	int score = 0;
+	SOCKET connect;
 };
 struct Connect {
 	WSAData wsaData;
 	WORD DLLversion;
 	SOCKADDR_IN addr;
 	int sizeofaddr;
+	
 };
 void Inithilization(Connect& cn, string ip, short int port) {
 	cn.DLLversion = MAKEWORD(2, 1);
@@ -39,7 +41,9 @@ void ConnectSocket(Connect& cn) {
 			cout << "Error Connection\n";
 		else
 			cout << "Connect\n";
-		conn.push_back(newConnection);
+		Player* pl = new Player;
+		pl->connect = newConnection;
+		conn.push_back(pl);
 
 	}
 }
