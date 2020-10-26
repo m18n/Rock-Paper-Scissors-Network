@@ -12,20 +12,26 @@ void Singup(char lo[50], int passwor)
     int password1;
 	cout << "Login:";
 	cin >> lo;
-	cout << "password:";
-	cin >> passwor;
-	cout << "password:";
-	cin >> password1;
+	int i = 0;
+	while (i==0)
+	{
+		cout << "password:";
+		cin >> passwor;
+		cout << "password:";
+		cin >> password1;
 		if (passwor == password1)
 		{
 			passwor = passwor;
-			
+			i = 1;
 		}
 		else if (passwor != password1)
 		{
-			cout << "password";
-			cin >> password1;
+			cout << "please(pasword=pasword)\n";
+
 		}
+	}
+	
+			
 }
 struct Player
 {
