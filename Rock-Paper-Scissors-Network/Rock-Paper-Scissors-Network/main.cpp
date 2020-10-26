@@ -2,7 +2,7 @@
 using namespace std;
 struct Player
 {
-	char login[20];
+	char login[20]="";
 	int password = 0;
 	int score = 0;
 };
@@ -13,35 +13,24 @@ void SingIn(char login[20],int& password)
 	cout << "Password:";
 	cin >> password;
 }
-void SingUp(char login[50], int& password)
+void SingUp(char login[20], int& password)
 {
-	int password1;
+	int password1=0;
+	system("cls");
 	cout << "Login:";
 	cin >> login;
-	int i = 0;
-	while (i == 0)
+	system("cls");
+	do
 	{
-		cout << "password:";
+		
+		cout << "Password:";
 		cin >> password;
-		cout << "password:";
+		cout << "Password:";
 		cin >> password1;
-		if (password == password1)
-		{
-			password = password;
-			i = 1;
-		}
-		else if (password != password1)
-		{
-			cout << "please(pasword=pasword)\n";
-
-		}
-	}
-
-
+		system("cls");
+	} while (password != password1);
 }
-
-int main() {
-	Player pl;
+void Login(Player& pl) {
 	int choice = 0;
 	cout << "Sing in-1\n";
 	cout << "Sing up-2\n";
@@ -49,7 +38,11 @@ int main() {
 	if (choice == 1)
 		SingIn(pl.login, pl.password);
 	else if (choice == 2)
-		SingUp(pl.login,pl.password);
+		SingUp(pl.login, pl.password);
+}
+int main() {
+	Player pl;
+	Login(pl);
 	system("pause");
 	return 0;
 }
