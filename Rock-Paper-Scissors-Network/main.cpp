@@ -10,11 +10,11 @@ void Vxid(int pass,char Log[50])
 void Singup(char lo[50], int passwor)
 {
     int password1;
-	cout << "Login";
+	cout << "Login:";
 	cin >> lo;
-	cout << "password";
+	cout << "password:";
 	cin >> passwor;
-	cout << "password";
+	cout << "password:";
 	cin >> password1;
 		if (passwor == password1)
 		{
