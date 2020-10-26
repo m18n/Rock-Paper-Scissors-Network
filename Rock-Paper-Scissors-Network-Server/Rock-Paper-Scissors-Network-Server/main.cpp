@@ -4,19 +4,18 @@
 #pragma warning(disable:4996)
 #pragma comment(lib,"ws2_32.lib")
 using namespace std;
-list<Player> conn;
 struct Player {
 	char login[20];
 	int password = 0;
 	int score = 0;
 	SOCKET connect;
 };
+list<Player*> conn;
 struct Connect {
 	WSAData wsaData;
 	WORD DLLversion;
 	SOCKADDR_IN addr;
 	int sizeofaddr;
-	
 };
 void Inithilization(Connect& cn, string ip, short int port) {
 	cn.DLLversion = MAKEWORD(2, 1);
@@ -28,6 +27,13 @@ void Inithilization(Connect& cn, string ip, short int port) {
 	cn.addr.sin_addr.s_addr = inet_addr(ip.c_str());
 	cn.addr.sin_port = htons(port);
 	cn.addr.sin_family = AF_INET;
+}
+void Login(Player& pl) {
+	char temp[20];
+	char key[1];
+	recv(pl.connect, key, sizeof(key), NULL);
+	recv(pl.connect,pl.login,sizeof(pl.login),NULL);
+	recv(pl.connect,temp,sizeof(temp),NULL);
 }
 void ConnectSocket(Connect& cn) {
 	SOCKET sListen = socket(AF_INET, SOCK_STREAM, NULL);
@@ -44,7 +50,7 @@ void ConnectSocket(Connect& cn) {
 		Player* pl = new Player;
 		pl->connect = newConnection;
 		conn.push_back(pl);
-
+		CreateThread(NULL,NULL,(LPTHREAD_START_ROUTINE)Login,pl,NULL,NULL);
 	}
 }
 int main() {
