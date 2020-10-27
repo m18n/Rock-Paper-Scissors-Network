@@ -2,6 +2,7 @@
 #include<vector>
 #include<WinSock2.h>
 #include<fstream>
+#include"string.h"
 #pragma warning(disable:4996)
 #pragma comment(lib,"ws2_32.lib")
 using namespace std;
@@ -32,40 +33,55 @@ void Inithilization(Connect& cn, string ip, short int port) {
 }
 void Login(Player& pl) {
 	char password[20];
-	char key[1];
+	char key[2];
 	char temp[10];
-	recv(pl.connect, key, sizeof(key), NULL);
-	recv(pl.connect,pl.login,sizeof(pl.login),NULL);
-	recv(pl.connect,password,sizeof(password),NULL);
+	char score[10];
+	int number = 0;
+	int size = sizeof(pl.login);
+	cout << "COnnection pl:  " << &pl.connect<<"\n";
+	number =recv(pl.connect, key, sizeof(key), NULL);
+	number = recv(pl.connect,pl.login,size,NULL);
+	number = recv(pl.connect,password,20,NULL);
 	ifstream fi("BD Player/Player.txt");
-	string login = "";
+	string temp2 = "";
 	if (key[0] == 'i') {
-		while (login != pl.login)
-			fi >> login;
-		if (login != pl.login) {
+		while (temp2 != pl.login)
+			fi >> temp2;
+		if (temp2 != pl.login) {
 			strcpy_s(temp, "Error");
 			send(pl.connect, temp, strlen(temp), NULL);
 		}
 		else {
-			fi >> login;
-			if(strcmp(login.c_str(),password)!=0)
+			fi >> temp2;
+			fi >> temp2;//password
+			fi >> score;
+			fi >> score;
+			if (strcmp(temp2.c_str(), password) != 0) {
+				strcpy_s(pl.login, "");
+				pl.password = 0;
 				strcpy_s(temp, "Error");
-			else
+				strcpy_s(score, "");
+			}
+			else {
+				pl.password = atoi(password);
 				strcpy_s(temp, "ok");
+			}
 			send(pl.connect, temp, strlen(temp), NULL);
+			send(pl.connect, score, strlen(score), NULL);
+			
 		}
 	}
 	else if(key[0]=='u') {
 		ofstream fs;
-		while (login != pl.login)
-			fi >> login;
-		if (login == pl.login)
+		while (temp2 != pl.login)
+			fi >> temp2;
+		if (temp2 == pl.login)
 			strcpy_s(temp, "Error");
 		else
 			strcpy_s(temp, "ok");
 		send(pl.connect, temp, strlen(temp), NULL);
 		fs.open("BD Player/Player.txt", ios_base::app);
-		fs << "Login: " << pl.login << " Password: " << password;
+		fs << "Login: " << pl.login << " Password: " << password<<" Score: 0"<<"\n";
 		fs.close();
 		
 	}
@@ -86,6 +102,8 @@ void ConnectSocket(Connect& cn) {
 			cout << "Connect\n";
 		Player* pl = new Player;
 		pl->connect = newConnection;
+		cout << "COnnection:  " << &newConnection<<"\n";
+		cout << "COnnection pl:  " << &pl->connect<<"\n";
 		pl->online = true;
 		for (int i = 0; i < conn.size(); i++)
 		{
