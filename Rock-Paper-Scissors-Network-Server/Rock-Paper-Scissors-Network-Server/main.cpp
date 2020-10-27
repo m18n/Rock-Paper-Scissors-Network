@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<WinSock2.h>
+#include<fstream>
 #pragma warning(disable:4996)
 #pragma comment(lib,"ws2_32.lib")
 using namespace std;
@@ -31,9 +32,42 @@ void Inithilization(Connect& cn, string ip, short int port) {
 void Login(Player& pl) {
 	char password[20];
 	char key[1];
+	char temp[10];
 	recv(pl.connect, key, sizeof(key), NULL);
 	recv(pl.connect,pl.login,sizeof(pl.login),NULL);
 	recv(pl.connect,password,sizeof(password),NULL);
+	ifstream fi("BD Player/Player.txt");
+	string login = "";
+	if (key[0] == 'i') {
+		while (login != pl.login)
+			fi >> login;
+		if (login != pl.login) {
+			strcpy_s(temp, "Error");
+			send(pl.connect, temp, strlen(temp), NULL);
+		}
+		else {
+			fi >> login;
+			if(strcmp(login.c_str(),password)!=0)
+				strcpy_s(temp, "Error");
+			else
+				strcpy_s(temp, "ok");
+			send(pl.connect, temp, strlen(temp), NULL);
+		}
+	}
+	else if(key[0]=='u') {
+		ofstream fs;
+		while (login != pl.login)
+			fi >> login;
+		if (login == pl.login)
+			strcpy_s(temp, "Error");
+		else
+			strcpy_s(temp, "ok");
+		send(pl.connect, temp, strlen(temp), NULL);
+		fs.open("BD Player/Player.txt", ios_base::app);
+		fs << "Login: " << pl.login << " Password: " << password;
+		fs.close();
+		
+	}
 }
 void ConnectSocket(Connect& cn) {
 	SOCKET sListen = socket(AF_INET, SOCK_STREAM, NULL);
