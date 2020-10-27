@@ -10,6 +10,7 @@ struct Player {
 	int password = 0;
 	int score = 0;
 	SOCKET connect=NULL;
+	bool online=false;
 };
 vector<Player*> conn;
 struct Connect {
@@ -74,6 +75,7 @@ void ConnectSocket(Connect& cn) {
 	bind(sListen, (SOCKADDR*)&cn.addr, sizeof(cn.addr));
 	listen(sListen, SOMAXCONN);
 	SOCKET newConnection;
+	bool search = false;
 	while (true)
 	{
 		newConnection = accept(sListen, (SOCKADDR*)&cn.addr, &cn.sizeofaddr);
@@ -83,7 +85,17 @@ void ConnectSocket(Connect& cn) {
 			cout << "Connect\n";
 		Player* pl = new Player;
 		pl->connect = newConnection;
-		conn.push_back(pl);
+		pl->online = true;
+		for (int i = 0; i < conn.size(); i++)
+		{
+			if (conn[i]->online == false) {
+				conn[i] = pl;
+				search = true;
+				break;
+			}
+		}
+		if(search==false)
+			conn.push_back(pl);
 		CreateThread(NULL,NULL,(LPTHREAD_START_ROUTINE)Login,pl,NULL,NULL);
 	}
 }
