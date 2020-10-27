@@ -1,16 +1,16 @@
 #include<iostream>
-#include<list>
+#include<vector>
 #include<WinSock2.h>
 #pragma warning(disable:4996)
 #pragma comment(lib,"ws2_32.lib")
 using namespace std;
 struct Player {
-	char login[20];
+	char login[20]="";
 	int password = 0;
 	int score = 0;
-	SOCKET connect;
+	SOCKET connect=NULL;
 };
-list<Player*> conn;
+vector<Player*> conn;
 struct Connect {
 	WSAData wsaData;
 	WORD DLLversion;
@@ -29,11 +29,11 @@ void Inithilization(Connect& cn, string ip, short int port) {
 	cn.addr.sin_family = AF_INET;
 }
 void Login(Player& pl) {
-	char temp[20];
+	char password[20];
 	char key[1];
 	recv(pl.connect, key, sizeof(key), NULL);
 	recv(pl.connect,pl.login,sizeof(pl.login),NULL);
-	recv(pl.connect,temp,sizeof(temp),NULL);
+	recv(pl.connect,password,sizeof(password),NULL);
 }
 void ConnectSocket(Connect& cn) {
 	SOCKET sListen = socket(AF_INET, SOCK_STREAM, NULL);
@@ -58,8 +58,6 @@ int main() {
 	Connect cn;
 	Inithilization(cn, "192.168.0.103", 9999);
 	ConnectSocket(cn);
-
-
 	system("pause");
 	return 0;
 }
