@@ -78,6 +78,7 @@ void ConnectSocket(Connect& cn) {
 	bool search = false;
 	while (true)
 	{
+		search = false;
 		newConnection = accept(sListen, (SOCKADDR*)&cn.addr, &cn.sizeofaddr);
 		if (newConnection == 0)
 			cout << "Error Connection\n";
