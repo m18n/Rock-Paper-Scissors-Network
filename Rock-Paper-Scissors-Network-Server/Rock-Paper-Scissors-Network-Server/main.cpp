@@ -21,6 +21,22 @@ struct Connect {
 	SOCKADDR_IN addr;
 	int sizeofaddr;
 };
+void recvEx(Player& pl, char* buff, int size) {
+	int res = recv(pl.connect, buff, size, NULL);
+	if (res <= 0) {
+		closesocket(pl.connect);
+		pl.online = false;
+		cout << "Disconnet\n";
+	}
+}
+void sendEx(Player& pl, const char* buff, int size) {
+	int res = send(pl.connect, buff, size, NULL);
+	if (res < 0) {
+		closesocket(pl.connect);
+		pl.online = false;
+		cout << "Disconnet\n";
+	}
+}
 void Inithilization(Connect& cn, string ip, short int port) {
 	cn.DLLversion = MAKEWORD(2, 2);
 	if (WSAStartup(cn.DLLversion, &cn.wsaData) != 0) {
@@ -41,7 +57,7 @@ void SingIn(Player& pl,char password[20]) {
 		fi >> temp2;
 	if (temp2 != pl.login) {
 		strcpy_s(temp, "Error");
-		send(pl.connect, temp, strlen(temp), NULL);
+		sendEx(pl, temp, strlen(temp));
 	}
 	else {
 		fi >> temp2;
@@ -58,8 +74,8 @@ void SingIn(Player& pl,char password[20]) {
 			pl.password = atoi(password);
 			strcpy_s(temp, "ok");
 		}
-		send(pl.connect, temp, strlen(temp) + 1, NULL);
-		send(pl.connect, score, strlen(score) + 1, NULL);
+		sendEx(pl, temp, strlen(temp) + 1);
+		sendEx(pl, score, strlen(score) + 1);
 	}
 	fi.close();
 }
@@ -75,20 +91,20 @@ void SingUp(Player& pl) {
 		strcpy_s(temp, "Error");
 	else
 		strcpy_s(temp, "ok");
-	send(pl.connect, temp, strlen(temp), NULL);
+	sendEx(pl, temp, strlen(temp));
 	fs.open("BD Player/Player.txt", ios_base::app);
 	fs << "Login: " << pl.login << " Password: " << password << " Score: 0" << "\n";
 	fs.close();
 	fi.close();
 }
+
 void Login(Player& pl) {
 	char password[20];
 	char key[2];
-	int number = 0;
 	int size = sizeof(pl.login);
-	number =recv(pl.connect, key, sizeof(key), NULL);
-	number = recv(pl.connect,pl.login,size,NULL);
-	number = recv(pl.connect,password,20,NULL);
+	recvEx(pl, key, sizeof(key));
+	recvEx(pl,pl.login,size);
+	recvEx(pl,password,20);
 	if (key[0] == 'i') {
 		SingIn(pl,password);
 	}
