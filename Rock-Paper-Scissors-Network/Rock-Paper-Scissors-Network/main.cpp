@@ -46,7 +46,16 @@ void sendEx(Serwerconnect& sr,SOCKET& Connection,const char* buff,int size) {
 		closesocket(Connection);
 		system("cls");
 		Connect(sr);
-		WSACleanup();
+		return;
+	}
+}
+void recvEx(Serwerconnect& sr, SOCKET& Connection,char* buff, int size) {
+	int result = recv(Connection, buff, size, NULL);
+	if (result == SOCKET_ERROR) {
+		printf("send failed: %d\n", WSAGetLastError());
+		closesocket(Connection);
+		system("cls");
+		Connect(sr);
 		return;
 	}
 }
@@ -57,8 +66,8 @@ bool SendLogin(Serwerconnect& sr,const char passwordchar[20],const char login[20
 	sendEx(sr,sr.Conection, "i", 2);
 	sendEx(sr,sr.Conection, login, strlen(login) + 1);
 	sendEx(sr,sr.Conection, passwordchar, size_password);
-	recv(sr.Conection, temp, sizeof(temp), NULL);
-	recv(sr.Conection, score, sizeof(score), NULL);
+	recvEx(sr,sr.Conection, temp, sizeof(temp));
+	recvEx(sr,sr.Conection, score, sizeof(score));
 	if (strcmp(temp, "ok") == 0)
 		return true;
 	else
