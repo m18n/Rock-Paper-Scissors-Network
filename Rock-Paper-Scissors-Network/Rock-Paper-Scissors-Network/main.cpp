@@ -5,6 +5,10 @@
 #include<string>
 using namespace std;
 SOCKET Conection;
+void MainMenu(int MenuOptions)
+{
+
+}
 struct Player
 {
 	char login[20]="";
@@ -110,6 +114,10 @@ int main() {
 	Conect();
 	Player pl;
 	Login(pl);
+	cout << "MainMenu\n";
+	cout << "ConectRoom-0\n";
+	cout << "Ontions-1\n";
+	cout << "exit-2\n";
 	system("pause");
 	return 0;
 }
