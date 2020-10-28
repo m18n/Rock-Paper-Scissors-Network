@@ -100,6 +100,7 @@ bool SendLogin(Serwerconnect& sr,const char passwordchar[20],const char login[20
 	int size_password = strlen(passwordchar)+1;
 	sendEx(sr,sr.Conection, "i", 2);
 	sendEx(sr,sr.Conection, login, strlen(login) + 1);
+	Sleep(100);
 	sendEx(sr,sr.Conection, passwordchar, size_password);
 	recvEx(sr,sr.Conection, temp, sizeof(temp));
 	recvEx(sr,sr.Conection, score, sizeof(score));
@@ -120,7 +121,7 @@ void SingIn(Serwerconnect& sr,char login[20],int& password)
 	if(res==false)
 		cout << "Error:you computer alahatbar\n";
 	else
-		cout << "Sucsesful";
+		cout << "Sucsesful\n";
 }
 void SingUp(Serwerconnect& sr,char login[20], int& password)
 {
@@ -158,15 +159,16 @@ int main() {
 	Serwerconnect con;
 	Player pl;
 	int mainop;
+	Inithilization(con);
+	Connect(con);
+	Login(pl,con);
+	system("cls");
 	cout << "MainMenu\n";
 	cout << "ConectRoom-0\n";
 	cout << "Options-1\n";
 	cout << "exit-2\n";
-	cin >>mainop;
+	cin >> mainop;
 	MainMenu(mainop);
-	Inithilization(con);
-	Connect(con);
-	Login(pl,con);
 	system("pause");
 	return 0;
 }
