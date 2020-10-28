@@ -32,10 +32,9 @@ void Inithilization(Connect& cn, string ip, short int port) {
 	cn.addr.sin_port = htons(port);
 	cn.addr.sin_family = AF_INET;
 }
-void SingIn(Player& pl) {
+void SingIn(Player& pl,char password[20]) {
 	char temp[10];
 	char score[10];
-	char password[20];
 	ifstream fi("BD Player/Player.txt");
 	string temp2 = "";
 	while (temp2 != pl.login)//search login
@@ -91,7 +90,7 @@ void Login(Player& pl) {
 	number = recv(pl.connect,pl.login,size,NULL);
 	number = recv(pl.connect,password,20,NULL);
 	if (key[0] == 'i') {
-		SingIn(pl);
+		SingIn(pl,password);
 	}
 	else if(key[0]=='u') {
 		SingUp(pl);

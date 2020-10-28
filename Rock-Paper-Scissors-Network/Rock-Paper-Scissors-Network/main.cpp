@@ -71,6 +71,7 @@ bool SendLogin(Serwerconnect& sr,const char passwordchar[20],const char login[20
 	int size_password = strlen(passwordchar)+1;
 	sendEx(sr,sr.Conection, "i", 2);
 	sendEx(sr,sr.Conection, login, strlen(login) + 1);
+	Sleep(100);
 	sendEx(sr,sr.Conection, passwordchar, size_password);
 	recvEx(sr,sr.Conection, temp, sizeof(temp));
 	recvEx(sr,sr.Conection, score, sizeof(score));
@@ -125,9 +126,11 @@ void Login(Player& pl, Serwerconnect& sr) {
 	else if (choice == 2)
 		SingUp(sr,pl.login, pl.password);
 }
+
 int main() {
 	Serwerconnect con;
 	Player pl;
+	
 	Inithilization(con);
 	Connect(con);
 	Login(pl,con);
