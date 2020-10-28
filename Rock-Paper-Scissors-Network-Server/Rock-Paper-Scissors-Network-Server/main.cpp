@@ -1,3 +1,4 @@
+#define WIN32_LEAN_AND_MEAN
 #include<iostream>
 #include<vector>
 #include<WinSock2.h>
@@ -21,7 +22,7 @@ struct Connect {
 	int sizeofaddr;
 };
 void Inithilization(Connect& cn, string ip, short int port) {
-	cn.DLLversion = MAKEWORD(2, 1);
+	cn.DLLversion = MAKEWORD(2, 2);
 	if (WSAStartup(cn.DLLversion, &cn.wsaData) != 0) {
 		cout << "Error 1\n";
 		exit(1);
@@ -38,7 +39,6 @@ void Login(Player& pl) {
 	char score[10];
 	int number = 0;
 	int size = sizeof(pl.login);
-	cout << "COnnection pl:  " << &pl.connect<<"\n";
 	number =recv(pl.connect, key, sizeof(key), NULL);
 	number = recv(pl.connect,pl.login,size,NULL);
 	number = recv(pl.connect,password,20,NULL);
@@ -66,8 +66,8 @@ void Login(Player& pl) {
 				pl.password = atoi(password);
 				strcpy_s(temp, "ok");
 			}
-			send(pl.connect, temp, strlen(temp), NULL);
-			send(pl.connect, score, strlen(score), NULL);
+			send(pl.connect, temp, strlen(temp)+1, NULL);
+			send(pl.connect, score, strlen(score)+1, NULL);
 			
 		}
 	}
@@ -102,8 +102,6 @@ void ConnectSocket(Connect& cn) {
 			cout << "Connect\n";
 		Player* pl = new Player;
 		pl->connect = newConnection;
-		cout << "COnnection:  " << &newConnection<<"\n";
-		cout << "COnnection pl:  " << &pl->connect<<"\n";
 		pl->online = true;
 		for (int i = 0; i < conn.size(); i++)
 		{
