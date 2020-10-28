@@ -32,58 +32,69 @@ void Inithilization(Connect& cn, string ip, short int port) {
 	cn.addr.sin_port = htons(port);
 	cn.addr.sin_family = AF_INET;
 }
+void SingIn(Player& pl) {
+	char temp[10];
+	char score[10];
+	char password[20];
+	ifstream fi("BD Player/Player.txt");
+	string temp2 = "";
+	while (temp2 != pl.login)//search login
+		fi >> temp2;
+	if (temp2 != pl.login) {
+		strcpy_s(temp, "Error");
+		send(pl.connect, temp, strlen(temp), NULL);
+	}
+	else {
+		fi >> temp2;
+		fi >> temp2;//password
+		fi >> score;
+		fi >> score;
+		if (strcmp(temp2.c_str(), password) != 0) {
+			strcpy_s(pl.login, "");
+			pl.password = 0;
+			strcpy_s(temp, "Error");
+			strcpy_s(score, "");
+		}
+		else {
+			pl.password = atoi(password);
+			strcpy_s(temp, "ok");
+		}
+		send(pl.connect, temp, strlen(temp) + 1, NULL);
+		send(pl.connect, score, strlen(score) + 1, NULL);
+	}
+	fi.close();
+}
+void SingUp(Player& pl) {
+	ifstream fi("BD Player/Player.txt");
+	ofstream fs;
+	char temp[10];
+	char password[20];
+	string temp2 = "";
+	while (temp2 != pl.login)
+		fi >> temp2;
+	if (temp2 == pl.login)
+		strcpy_s(temp, "Error");
+	else
+		strcpy_s(temp, "ok");
+	send(pl.connect, temp, strlen(temp), NULL);
+	fs.open("BD Player/Player.txt", ios_base::app);
+	fs << "Login: " << pl.login << " Password: " << password << " Score: 0" << "\n";
+	fs.close();
+	fi.close();
+}
 void Login(Player& pl) {
 	char password[20];
 	char key[2];
-	char temp[10];
-	char score[10];
 	int number = 0;
 	int size = sizeof(pl.login);
 	number =recv(pl.connect, key, sizeof(key), NULL);
 	number = recv(pl.connect,pl.login,size,NULL);
 	number = recv(pl.connect,password,20,NULL);
-	ifstream fi("BD Player/Player.txt");
-	string temp2 = "";
 	if (key[0] == 'i') {
-		while (temp2 != pl.login)
-			fi >> temp2;
-		if (temp2 != pl.login) {
-			strcpy_s(temp, "Error");
-			send(pl.connect, temp, strlen(temp), NULL);
-		}
-		else {
-			fi >> temp2;
-			fi >> temp2;//password
-			fi >> score;
-			fi >> score;
-			if (strcmp(temp2.c_str(), password) != 0) {
-				strcpy_s(pl.login, "");
-				pl.password = 0;
-				strcpy_s(temp, "Error");
-				strcpy_s(score, "");
-			}
-			else {
-				pl.password = atoi(password);
-				strcpy_s(temp, "ok");
-			}
-			send(pl.connect, temp, strlen(temp)+1, NULL);
-			send(pl.connect, score, strlen(score)+1, NULL);
-			
-		}
+		SingIn(pl);
 	}
 	else if(key[0]=='u') {
-		ofstream fs;
-		while (temp2 != pl.login)
-			fi >> temp2;
-		if (temp2 == pl.login)
-			strcpy_s(temp, "Error");
-		else
-			strcpy_s(temp, "ok");
-		send(pl.connect, temp, strlen(temp), NULL);
-		fs.open("BD Player/Player.txt", ios_base::app);
-		fs << "Login: " << pl.login << " Password: " << password<<" Score: 0"<<"\n";
-		fs.close();
-		
+		SingUp(pl);
 	}
 }
 void ConnectSocket(Connect& cn) {

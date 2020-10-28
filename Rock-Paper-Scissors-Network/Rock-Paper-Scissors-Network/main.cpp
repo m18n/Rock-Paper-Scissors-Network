@@ -27,10 +27,11 @@ void Inithilization(Serwerconnect& sr) {
 	sr.addr.sin_addr.s_addr = inet_addr("77.121.173.140");
 	sr.addr.sin_port = htons(8080);
 	sr.addr.sin_family = AF_INET;
-	sr.Conection = socket(AF_INET, SOCK_STREAM, NULL);
+	
 }
 void Connect(Serwerconnect& sr)
 {
+	sr.Conection = socket(AF_INET, SOCK_STREAM, NULL);
 	if (connect(sr.Conection, (SOCKADDR*)&sr.addr, sizeof(sr.addr))!=0)
 	{
 		closesocket(sr.Conection);
