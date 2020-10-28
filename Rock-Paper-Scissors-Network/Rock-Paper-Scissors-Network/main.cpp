@@ -164,7 +164,7 @@ int main() {
 	Login(pl,con);
 	system("cls");
 	cout << "MainMenu\n";
-	cout << "ConectRoom-0\n";
+	cout << "PlayGame-0\n";
 	cout << "Options-1\n";
 	cout << "exit-2\n";
 	cin >> mainop;
