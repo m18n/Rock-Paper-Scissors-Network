@@ -1,2 +1,5 @@
 #include "MiniGames.h"
-#include <iostream>
+void MiniGames::RockPaper() 
+{
+
+}

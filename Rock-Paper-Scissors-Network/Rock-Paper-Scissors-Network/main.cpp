@@ -5,9 +5,34 @@
 #include<string>
 using namespace std;
 SOCKET Conection;
+void Options() 
+{
+	
+}
+void Conectroom() 
+{
+	string KeyRoom;
+	cout << "room Key:";
+	cin >> KeyRoom;
+}
 void MainMenu(int MenuOptions)
 {
-
+	if (MenuOptions==0)
+	{
+		Conectroom();
+	}
+	else if (MenuOptions == 1)
+	{
+		Options();
+	}
+	else if (MenuOptions == 2)
+	{
+		exit(1);
+	}
+	else
+	{
+		cout << "Error 2";
+	}
 }
 struct Player
 {
@@ -27,7 +52,7 @@ void Conect()
 	{
 		system("cls");
 		int true2;
-		cout << "Error:failed conect serwer\n"<<"Please restart you program\n"<<"1-conect\n"<<"0-exit\n";
+		cout << "Error :failed conect serwer\n"<<"Please restart you program\n"<<"1-conect\n"<<"0-exit\n";
 		cin >> true2;
 		if (true2==0)
 		{
@@ -114,10 +139,13 @@ int main() {
 	Conect();
 	Player pl;
 	Login(pl);
+	int mainop;
 	cout << "MainMenu\n";
 	cout << "ConectRoom-0\n";
-	cout << "Ontions-1\n";
+	cout << "Options-1\n";
 	cout << "exit-2\n";
+	cin >>mainop;
+	MainMenu(mainop);
 	system("pause");
 	return 0;
 }
