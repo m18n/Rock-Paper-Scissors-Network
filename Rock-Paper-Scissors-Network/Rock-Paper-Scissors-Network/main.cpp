@@ -11,9 +11,24 @@ void Options()
 }
 void Conectroom() 
 {
+	int main_ConectRoom1;
 	string KeyRoom;
-	cout << "room Key:";
-	cin >> KeyRoom;
+	cout <<"Search room-0\n" ;
+	cout << "ConectRoom-1";
+	cin >> main_ConectRoom1;
+	if (main_ConectRoom1==0)
+	{
+	
+	}
+	else if (main_ConectRoom1==1)
+	{
+		cout << "Room key";
+		cin >> KeyRoom;
+	}
+	else 
+	{
+		cout << "Error 2";
+	}
 }
 void MainMenu(int MenuOptions)
 {
