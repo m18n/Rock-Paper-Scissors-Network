@@ -18,14 +18,14 @@ struct Serwerconnect
 	SOCKADDR_IN addr;
 	SOCKET Conection;
 };
-void Inithilization(Serwerconnect& sr) {
+void Inithilization(Serwerconnect& sr,string ip,int port) {
 	sr.DLLversion = MAKEWORD(2, 2);
 	if (WSAStartup(sr.DLLversion, &sr.wsaData) != 0) {
 		cout << "Error 1\n";
 		exit(1);
 	}
-	sr.addr.sin_addr.s_addr = inet_addr("77.121.173.140");
-	sr.addr.sin_port = htons(8080);
+	sr.addr.sin_addr.s_addr = inet_addr(ip.c_str());
+	sr.addr.sin_port = htons(port);
 	sr.addr.sin_family = AF_INET;
 	
 }
@@ -131,7 +131,7 @@ int main() {
 	Serwerconnect con;
 	Player pl;
 	
-	Inithilization(con);
+	Inithilization(con, "77.121.173.140",8080);
 	Connect(con);
 	Login(pl,con);
 
