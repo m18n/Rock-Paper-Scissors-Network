@@ -53,7 +53,7 @@ void Inithilization(Connect& cn, string ip, short int port) {
 void SingIn(Player& pl,char password[20]) {
 	char temp[20];
 	char score[10];
-	ifstream fi("BD Player/Player.txt");
+	ifstream fi("BD_Player/Player.txt");
 	string temp2 = "";
 	while (temp2 != pl.login)//search login
 	{
@@ -88,7 +88,7 @@ void SingIn(Player& pl,char password[20]) {
 	fi.close();
 }
 void SingUp(Player& pl, char password[20]) {
-	ifstream fi("BD Player/Player.txt");
+	ifstream fi("BD_Player/Player.txt");
 	ofstream fs;
 	char temp[10];
 	string temp2 = "";
