@@ -93,13 +93,15 @@ void SingUp(Player& pl, char password[20]) {
 	}
 	if (temp2 == pl.login)
 		strcpy_s(temp, "Error");
-	else
+	else {
 		strcpy_s(temp, "ok");
+		fs.open("BD Player/Player.txt", ios_base::app);
+		fs << "Login: " << pl.login << " Password: " << password << " Score: 0" << "\n";
+		fs.close();
+		fi.close();
+	}
 	sendEx(pl, temp, strlen(temp)+1);
-	fs.open("BD Player/Player.txt", ios_base::app);
-	fs << "Login: " << pl.login << " Password: " << password << " Score: 0" << "\n";
-	fs.close();
-	fi.close();
+	
 }
 void Login(Player& pl) {
 	char password[20];
