@@ -1,4 +1,0 @@
-Login: Vasa Password: 123 Score: 0
-Login: Rt Password: 123 Score: 0
-Login: sasha Password: 156 Score: 0
-Login: sasha123 Password: 157 Score: 0
