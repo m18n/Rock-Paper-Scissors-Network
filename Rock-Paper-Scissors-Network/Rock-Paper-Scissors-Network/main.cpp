@@ -62,14 +62,14 @@ struct Serwerconnect
 	SOCKADDR_IN addr;
 	SOCKET Conection;
 };
-void Inithilization(Serwerconnect& sr) {
+void Inithilization(Serwerconnect& sr,string ip,int port) {
 	sr.DLLversion = MAKEWORD(2, 2);
 	if (WSAStartup(sr.DLLversion, &sr.wsaData) != 0) {
 		cout << "Error 1\n";
 		exit(1);
 	}
-	sr.addr.sin_addr.s_addr = inet_addr("77.121.173.140");
-	sr.addr.sin_port = htons(8080);
+	sr.addr.sin_addr.s_addr = inet_addr(ip.c_str());
+	sr.addr.sin_port = htons(port);
 	sr.addr.sin_family = AF_INET;
 	
 }
@@ -109,16 +109,28 @@ void recvEx(Serwerconnect& sr, SOCKET& Connection,char* buff, int size) {
 		return;
 	}
 }
-bool SendLogin(Serwerconnect& sr,const char passwordchar[20],const char login[20]) {
+bool SendIn(Serwerconnect& sr,const char passwordchar[20],const char login[20]) {
 	char temp[20];
 	char score[20];
 	int size_password = strlen(passwordchar)+1;
 	sendEx(sr,sr.Conection, "i", 2);
-	sendEx(sr,sr.Conection, login, strlen(login) + 1);
+	sendEx(sr,sr.Conection, login,strlen(login) + 1);
 	Sleep(100);
 	sendEx(sr,sr.Conection, passwordchar, size_password);
 	recvEx(sr,sr.Conection, temp, sizeof(temp));
 	recvEx(sr,sr.Conection, score, sizeof(score));
+	if (strcmp(temp, "ok") == 0)
+		return true;
+	else
+		return false;
+}
+bool SendUp(Serwerconnect& sr, string password, const char login[20]) {
+	char temp[10];
+	sendEx(sr, sr.Conection, "u", 2);
+	sendEx(sr, sr.Conection, login, strlen(login)+1);
+	Sleep(100);
+	sendEx(sr, sr.Conection, password.c_str(), password.length()+1);
+	recvEx(sr, sr.Conection, temp, sizeof(temp));
 	if (strcmp(temp, "ok") == 0)
 		return true;
 	else
@@ -132,7 +144,7 @@ void SingIn(Serwerconnect& sr,char login[20],int& password)
 	cin >> password;
 	string paswordserwer;
 	paswordserwer = to_string(password);
-	bool res=SendLogin(sr, paswordserwer.c_str(),login);
+	bool res=SendIn(sr, paswordserwer.c_str(),login);
 	if(res==false)
 		cout << "Error:you computer alahatbar\n";
 	else
@@ -156,9 +168,11 @@ void SingUp(Serwerconnect& sr,char login[20], int& password)
 		system("cls");
 	} while (password != password1);
 	paswordserwer = to_string(password);
-	sendEx(sr,sr.Conection, "u", 1);
-	sendEx(sr,sr.Conection, login,strlen(login));
-	sendEx(sr,sr.Conection, paswordserwer.c_str(), paswordserwer.length());
+	bool res=SendUp(sr, paswordserwer, login);
+	if (res == false)
+		cout << "Error:you computer alahatbar\n";
+	else
+		cout << "Sucsesful\n";
 }
 void Login(Player& pl, Serwerconnect& sr) {
 	int choice = 0;
@@ -170,11 +184,12 @@ void Login(Player& pl, Serwerconnect& sr) {
 	else if (choice == 2)
 		SingUp(sr,pl.login, pl.password);
 }
+
 int main() {
 	Serwerconnect con;
 	Player pl;
 	int mainop;
-	Inithilization(con);
+	Inithilization(con, "77.121.173.140",8080);
 	Connect(con);
 	Login(pl,con);
 	system("cls");
