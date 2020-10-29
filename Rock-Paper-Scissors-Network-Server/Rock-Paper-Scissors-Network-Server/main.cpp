@@ -27,6 +27,7 @@ void recvEx(Player& pl, char* buff, int size) {
 		closesocket(pl.connect);
 		pl.online = false;
 		cout << "Disconnet\n";
+		throw "Disconnect";
 	}
 }
 void sendEx(Player& pl, const char* buff, int size) {
@@ -35,6 +36,7 @@ void sendEx(Player& pl, const char* buff, int size) {
 		closesocket(pl.connect);
 		pl.online = false;
 		cout << "Disconnet\n";
+		throw "Disconnect";
 	}
 }
 void Inithilization(Connect& cn, string ip, short int port) {
@@ -97,14 +99,18 @@ void SingUp(Player& pl) {
 	fs.close();
 	fi.close();
 }
-
 void Login(Player& pl) {
 	char password[20];
 	char key[2];
 	int size = sizeof(pl.login);
-	recvEx(pl, key, sizeof(key));
-	recvEx(pl,pl.login,size);
-	recvEx(pl,password,20);
+	try {
+		recvEx(pl, key, sizeof(key));
+		recvEx(pl, pl.login, size);
+		recvEx(pl, password, 20);
+	}
+	catch(...){
+		return;
+	}
 	if (key[0] == 'i') {
 		SingIn(pl,password);
 	}
