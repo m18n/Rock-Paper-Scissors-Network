@@ -65,16 +65,28 @@ void recvEx(Serwerconnect& sr, SOCKET& Connection,char* buff, int size) {
 		return;
 	}
 }
-bool SendLogin(Serwerconnect& sr,const char passwordchar[20],const char login[20]) {
+bool SendIn(Serwerconnect& sr,const char passwordchar[20],const char login[20]) {
 	char temp[20];
 	char score[20];
 	int size_password = strlen(passwordchar)+1;
 	sendEx(sr,sr.Conection, "i", 2);
-	sendEx(sr,sr.Conection, login, strlen(login) + 1);
+	sendEx(sr,sr.Conection, login,strlen(login) + 1);
 	Sleep(100);
 	sendEx(sr,sr.Conection, passwordchar, size_password);
 	recvEx(sr,sr.Conection, temp, sizeof(temp));
 	recvEx(sr,sr.Conection, score, sizeof(score));
+	if (strcmp(temp, "ok") == 0)
+		return true;
+	else
+		return false;
+}
+bool SendUp(Serwerconnect& sr, string password, const char login[20]) {
+	char temp[10];
+	sendEx(sr, sr.Conection, "u", 2);
+	sendEx(sr, sr.Conection, login, strlen(login)+1);
+	Sleep(100);
+	sendEx(sr, sr.Conection, password.c_str(), password.length()+1);
+	recvEx(sr, sr.Conection, temp, sizeof(temp));
 	if (strcmp(temp, "ok") == 0)
 		return true;
 	else
@@ -88,11 +100,11 @@ void SingIn(Serwerconnect& sr,char login[20],int& password)
 	cin >> password;
 	string paswordserwer;
 	paswordserwer = to_string(password);
-	bool res=SendLogin(sr, paswordserwer.c_str(),login);
+	bool res=SendIn(sr, paswordserwer.c_str(),login);
 	if(res==false)
 		cout << "Error:you computer alahatbar\n";
 	else
-		cout << "Sucsesful";
+		cout << "Sucsesful\n";
 }
 void SingUp(Serwerconnect& sr,char login[20], int& password)
 {
@@ -112,9 +124,11 @@ void SingUp(Serwerconnect& sr,char login[20], int& password)
 		system("cls");
 	} while (password != password1);
 	paswordserwer = to_string(password);
-	sendEx(sr,sr.Conection, "u", 1);
-	sendEx(sr,sr.Conection, login,strlen(login));
-	sendEx(sr,sr.Conection, paswordserwer.c_str(), paswordserwer.length());
+	bool res=SendUp(sr, paswordserwer, login);
+	if (res == false)
+		cout << "Error:you computer alahatbar\n";
+	else
+		cout << "Sucsesful\n";
 }
 void Login(Player& pl, Serwerconnect& sr) {
 	int choice = 0;

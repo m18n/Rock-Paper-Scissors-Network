@@ -1,2 +1,2 @@
-Login: sasha Passsword: 123 Score: 0
-Login: misha Passsword: 200 Score: 0
+Login: Vasa Password: 123 Score: 0
+Login: Vasa Password: 123 Score: 0

@@ -81,19 +81,21 @@ void SingIn(Player& pl,char password[20]) {
 	}
 	fi.close();
 }
-void SingUp(Player& pl) {
+void SingUp(Player& pl, char password[20]) {
 	ifstream fi("BD Player/Player.txt");
 	ofstream fs;
 	char temp[10];
-	char password[20];
 	string temp2 = "";
-	while (temp2 != pl.login)
+	while (temp2 != pl.login) {
+		if (fi.tellg() ==-1)
+			break;
 		fi >> temp2;
+	}
 	if (temp2 == pl.login)
 		strcpy_s(temp, "Error");
 	else
 		strcpy_s(temp, "ok");
-	sendEx(pl, temp, strlen(temp));
+	sendEx(pl, temp, strlen(temp)+1);
 	fs.open("BD Player/Player.txt", ios_base::app);
 	fs << "Login: " << pl.login << " Password: " << password << " Score: 0" << "\n";
 	fs.close();
@@ -106,7 +108,7 @@ void Login(Player& pl) {
 	try {
 		recvEx(pl, key, sizeof(key));
 		recvEx(pl, pl.login, size);
-		recvEx(pl, password, 20);
+		recvEx(pl, password, sizeof(password));
 	}
 	catch(...){
 		return;
@@ -115,7 +117,7 @@ void Login(Player& pl) {
 		SingIn(pl,password);
 	}
 	else if(key[0]=='u') {
-		SingUp(pl);
+		SingUp(pl,password);
 	}
 }
 void ConnectSocket(Connect& cn) {
