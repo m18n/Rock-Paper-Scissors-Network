@@ -136,7 +136,7 @@ bool SendUp(Serwerconnect& sr, string password, const char login[20]) {
 	else
 		return false;
 }
-void SingIn(Serwerconnect& sr,char login[20],int& password)
+void SingIn(Serwerconnect& sr, char login[20], int& password)
 {
 	cout << "Login:";
 	cin >> login;
@@ -144,11 +144,16 @@ void SingIn(Serwerconnect& sr,char login[20],int& password)
 	cin >> password;
 	string paswordserwer;
 	paswordserwer = to_string(password);
-	bool res=SendIn(sr, paswordserwer.c_str(),login);
-	if(res==false)
+	bool res = SendIn(sr, paswordserwer.c_str(), login);
+	if (res == false){
 		cout << "Error:you computer alahatbar\n";
+	cout << "restart Sing In";
+	Sleep(550);
+	SingIn();
+	}
 	else
 		cout << "Sucsesful\n";
+	Sleep(500);
 }
 void SingUp(Serwerconnect& sr,char login[20], int& password)
 {
