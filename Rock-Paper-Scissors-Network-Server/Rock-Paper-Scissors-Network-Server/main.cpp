@@ -51,15 +51,21 @@ void Inithilization(Connect& cn, string ip, short int port) {
 	cn.addr.sin_family = AF_INET;
 }
 void SingIn(Player& pl,char password[20]) {
-	char temp[10];
+	char temp[20];
 	char score[10];
 	ifstream fi("BD Player/Player.txt");
 	string temp2 = "";
 	while (temp2 != pl.login)//search login
+	{
+		if (fi.tellg() == -1)
+			break;
 		fi >> temp2;
+	}
 	if (temp2 != pl.login) {
 		strcpy_s(temp, "Error");
-		sendEx(pl, temp, strlen(temp));
+		sendEx(pl, temp, strlen(temp)+1);
+		strcpy_s(temp, "");
+		sendEx(pl, temp, strlen(temp)+1);
 	}
 	else {
 		fi >> temp2;
