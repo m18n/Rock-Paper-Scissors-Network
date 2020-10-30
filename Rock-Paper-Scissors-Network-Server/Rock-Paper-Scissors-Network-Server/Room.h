@@ -2,13 +2,14 @@
 #include"iostream"
 #include"Player.h"
 #include<vector>
+#include"time.h"
 using namespace std;
 struct Room {
-	string name="";
+	char name[10];
 	vector<Player**>pl;
 	int key=0;
 	int size=0;
-	string ops="";
 };
-void CreateRoom(Room* rm, int size, int key, string name, string ops);
+void CreateRoom(Room* rm, int size, int key,const char name[10]);
 void AddPlayer(Room* rm, Player** pl);
+void GenertyKey(vector<Room*>& rm, Room* r);

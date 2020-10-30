@@ -3,19 +3,12 @@
 #include<vector>
 #include<WinSock2.h>
 #include<fstream>
+#pragma warning(disable:4996)
+#pragma comment(lib,"ws2_32.lib")
 #include"Player.h"
 #include"string.h"
 #include"Network.h"
-#pragma warning(disable:4996)
-#pragma comment(lib,"ws2_32.lib")
 using namespace std;
-vector<Player*> conn;
-struct Connect {
-	WSAData wsaData;
-	WORD DLLversion;
-	SOCKADDR_IN addr;
-	int sizeofaddr=0;
-};
 void SingIn(Player& pl,char password[20]) {
 	char temp[20];
 	char score[10];
