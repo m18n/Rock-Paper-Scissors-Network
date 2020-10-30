@@ -3,53 +3,19 @@
 #include<vector>
 #include<WinSock2.h>
 #include<fstream>
+#include"Player.h"
 #include"string.h"
+#include"Network.h"
 #pragma warning(disable:4996)
 #pragma comment(lib,"ws2_32.lib")
 using namespace std;
-struct Player {
-	char login[20]="";
-	int password = 0;
-	int score = 0;
-	SOCKET connect=NULL;
-	bool online=false;
-};
 vector<Player*> conn;
 struct Connect {
 	WSAData wsaData;
 	WORD DLLversion;
 	SOCKADDR_IN addr;
-	int sizeofaddr;
+	int sizeofaddr=0;
 };
-void recvEx(Player& pl, char* buff, int size) {
-	int res = recv(pl.connect, buff, size, NULL);
-	if (res <= 0) {
-		closesocket(pl.connect);
-		pl.online = false;
-		cout << "Disconnet\n";
-		throw "Disconnect";
-	}
-}
-void sendEx(Player& pl, const char* buff, int size) {
-	int res = send(pl.connect, buff, size, NULL);
-	if (res < 0) {
-		closesocket(pl.connect);
-		pl.online = false;
-		cout << "Disconnet\n";
-		throw "Disconnect";
-	}
-}
-void Inithilization(Connect& cn, string ip, short int port) {
-	cn.DLLversion = MAKEWORD(2, 2);
-	if (WSAStartup(cn.DLLversion, &cn.wsaData) != 0) {
-		cout << "Error 1\n";
-		exit(1);
-	}
-	cn.sizeofaddr = sizeof(cn.addr);
-	cn.addr.sin_addr.s_addr = inet_addr(ip.c_str());
-	cn.addr.sin_port = htons(port);
-	cn.addr.sin_family = AF_INET;
-}
 void SingIn(Player& pl,char password[20]) {
 	char temp[20];
 	char score[10];
@@ -128,41 +94,12 @@ void Login(Player& pl) {
 		SingUp(pl,password);
 	}
 }
-void ConnectSocket(Connect& cn) {
-	SOCKET sListen = socket(AF_INET, SOCK_STREAM, NULL);
-	bind(sListen, (SOCKADDR*)&cn.addr, sizeof(cn.addr));
-	listen(sListen, SOMAXCONN);
-	SOCKET newConnection;
-	bool search = false;
-	while (true)
-	{
-		search = false;
-		newConnection = accept(sListen, (SOCKADDR*)&cn.addr, &cn.sizeofaddr);
-		if (newConnection == 0)
-			cout << "Error Connection\n";
-		else
-			cout << "Connect\n";
-		Player* pl = new Player;
-		pl->connect = newConnection;
-		pl->online = true;
-		for (int i = 0; i < conn.size(); i++)
-		{
-			if (conn[i]->online == false) {
-				conn[i] = pl;
-				search = true;
-				break;
-			}
-		}
-		if(search==false)
-			conn.push_back(pl);
-		CreateThread(NULL,NULL,(LPTHREAD_START_ROUTINE)Login,pl,NULL,NULL);
-	}
-}
 int main() {
+	vector<Player*>conn;
 	cout << "start server\n";
 	Connect cn;
 	Inithilization(cn, "192.168.0.103", 9999);
-	ConnectSocket(cn);
+	ConnectSocket(cn,conn,Login);
 	system("pause");
 	return 0;
 }
