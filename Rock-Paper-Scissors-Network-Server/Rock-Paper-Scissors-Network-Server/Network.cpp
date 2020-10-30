@@ -43,8 +43,7 @@ void Inithilization(Connect& cn, string ip, short int port) {
 void sendEx(Player& pl, const char* buff, int size) {
 	int res = send(pl.connect, buff, size, NULL);
 	if (res < 0) {
-		closesocket(pl.connect);
-		pl.online = false;
+		DeletePlayer(&pl);
 		cout << "Disconnet\n";
 		throw "Disconnect";
 	}
@@ -52,8 +51,7 @@ void sendEx(Player& pl, const char* buff, int size) {
 void recvEx(Player& pl, char* buff, int size) {
 	int res = recv(pl.connect, buff, size, NULL);
 	if (res <= 0) {
-		closesocket(pl.connect);
-		pl.online = false;
+		DeletePlayer(&pl);
 		cout << "Disconnet\n";
 		throw "Disconnect";
 	}

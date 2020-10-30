@@ -9,3 +9,4 @@ struct Player {
 	SOCKET connect = NULL;
 	bool online = false;
 };
+void DeletePlayer(Player* pl);

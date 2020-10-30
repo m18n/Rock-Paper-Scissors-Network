@@ -15,6 +15,7 @@ void AddPlayer(Room* rm, Player** pl) {
 void CreateRoom(Room* rm, int size, int key, const char name[10]) {
 	rm->key = key;
 	rm->size = size;
+	rm->online = true;
 	strcpy_s(rm->name, name);
 	rm->pl.resize(size);
 }
@@ -28,4 +29,25 @@ void GenertyKey(vector<Room*>& rm, Room* r) {
 		}
 	}
 	r->key = key;
+}
+void DeleteRoom(Room* rm) {
+	rm->key = 0;
+	rm->size = 0;
+	for (int i = 0; i < rm->pl.size(); i++) {
+		DeletePlayer(*rm->pl[i]);
+	}
+	rm->online = false;
+}
+void AddRoom(vector<Room*>& vrm, Room* rm) {
+	bool search = false;
+	for (int i = 0; i < vrm.size(); i++)
+	{
+		if (vrm[i]->online == false) {
+			vrm[i] = rm;
+			search = true;
+			break;
+		}
+	}
+	if (search == false)
+		vrm.push_back(rm);
 }

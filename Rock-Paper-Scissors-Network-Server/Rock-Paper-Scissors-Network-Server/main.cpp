@@ -8,6 +8,7 @@
 #include"Player.h"
 #include"string.h"
 #include"Network.h"
+#include"Room.h"
 using namespace std;
 void SingIn(Player& pl,char password[20]) {
 	char temp[20];
@@ -89,6 +90,7 @@ void Login(Player& pl) {
 }
 int main() {
 	vector<Player*>conn;
+	vector<Room*>rm;
 	cout << "start server\n";
 	Connect cn;
 	Inithilization(cn, "192.168.0.103", 9999);
