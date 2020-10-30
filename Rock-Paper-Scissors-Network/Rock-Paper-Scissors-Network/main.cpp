@@ -5,16 +5,26 @@
 #include<WinSock2.h>
 #include<string>
 using namespace std;
+struct Serwerconnect
+{
+	WSAData wsaData;
+	WORD DLLversion;
+	SOCKADDR_IN addr;
+	SOCKET Conection;
+};
 void Options() 
 {
 	
 }
-void Conectroom() 
+void Conectroom(Serwerconnect& sr)
 {
 	int main_ConectRoom1;
-	string KeyRoom;
+	string Nameroom;
+	int PlayerMax;
+	char KeyRoom[6];
+	cout << "Create Room-2\n";
 	cout <<"Search room-0\n" ;
-	cout << "ConectRoom-1";
+	cout << "ConectRoom-1\n";
 	cin >> main_ConectRoom1;
 	if (main_ConectRoom1==0)
 	{
@@ -25,16 +35,28 @@ void Conectroom()
 		cout << "Room key";
 		cin >> KeyRoom;
 	}
+	else if (main_ConectRoom1==2)
+	{
+		cout << "Room Name";
+		cin >> Nameroom;
+		cout << "Max Player";
+		cin >> PlayerMax;
+
+		sendEx(sr,sr.Conection, Nameroom.c_str(), Nameroom.length()+1);
+		sendEx(sr, sr.Conection, to_string(PlayerMax).c_str(), to_string(PlayerMax).length() + 1);
+		Sleep(100);
+		recvEx(sr, sr.Conection,KeyRoom,sizeof(KeyRoom));
+	}
 	else 
 	{
 		cout << "Error 2";
 	}
 }
-void MainMenu(int MenuOptions)
+void MainMenu(int MenuOptions, Serwerconnect& sr)
 {
 	if (MenuOptions==0)
 	{
-		Conectroom();
+		Conectroom(sr);
 	}
 	else if (MenuOptions == 1)
 	{
@@ -54,13 +76,6 @@ struct Player
 	char login[20]="";
 	int password = 0;
 	int score = 0;
-};
-struct Serwerconnect
-{
-	WSAData wsaData;
-	WORD DLLversion;
-	SOCKADDR_IN addr;
-	SOCKET Conection;
 };
 void Inithilization(Serwerconnect& sr,string ip,int port) {
 	sr.DLLversion = MAKEWORD(2, 2);
@@ -149,7 +164,7 @@ void SingIn(Serwerconnect& sr, char login[20], int& password)
 		cout << "Error:you computer alahatbar\n";
 	cout << "restart Sing In";
 	Sleep(550);
-	SingIn();
+	SingIn(sr,login,password);
 	}
 	else
 		cout << "Sucsesful\n";
@@ -203,7 +218,7 @@ int main() {
 	cout << "Options-1\n";
 	cout << "exit-2\n";
 	cin >> mainop;
-	MainMenu(mainop);
+	MainMenu(mainop, con);
 	system("pause");
 	return 0;
 }
