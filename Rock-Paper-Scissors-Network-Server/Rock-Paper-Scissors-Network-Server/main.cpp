@@ -67,34 +67,33 @@ void Menu(Player* pl) {
 	char keyroom[6];
 	try
 	{
-	recvEx(pl, key, sizeof(key));
-	if (key[0] == 'r') {//create
-		recvEx(pl, name, sizeof(name));
-		recvEx(pl, maxplayer, sizeof(maxplayer));
-		Room* r = new Room;
-		CreateRoom(r, atoi(maxplayer), 0, name);
-		GenertyKey(rm, r);
-		AddRoom(rm, r);
-		strcpy_s(keyroom, to_string(r->key).c_str());
-		sendEx(pl, keyroom, sizeof(keyroom));
-		cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << maxplayer << "\n";
-	}
-	else if (key[0] == 's') {//search
-
-	}
-	else if (key[0] == 'c') {//connect
-		recvEx(pl, keyroom, sizeof(keyroom));
-		Room* r = rm[SearchRoom(atoi(keyroom))];
-		AddPlayer(r, &pl);
-		int pler = 0;
-		for (int i = 0; i < r->size; i++) {
-			if (r->pl[i]!=NULL&&(*r->pl[i])->online == true) {
-				pler++;
-			}
+		recvEx(pl, key, sizeof(key));
+		if (key[0] == 'r') {//create
+			recvEx(pl, name, sizeof(name));
+			recvEx(pl, maxplayer, sizeof(maxplayer));
+			Room* r = new Room;
+			CreateRoom(r, atoi(maxplayer), 0, name);
+			GenertyKey(rm, r);
+			AddRoom(rm, r);
+			strcpy_s(keyroom, to_string(r->key).c_str());
+			sendEx(pl, keyroom, sizeof(keyroom));
+			cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << maxplayer << "\n";
+		}
+		else if (key[0] == 's') {//search
 
 		}
-		cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << r->size << " Player: " << pler << "\n";
-	}
+		else if (key[0] == 'c') {//connect
+			recvEx(pl, keyroom, sizeof(keyroom));
+			Room* r = rm[SearchRoom(atoi(keyroom))];
+			AddPlayer(r, pl);
+			int pler = 0;
+			for (int i = 0; i < r->size; i++) {
+				if (r->pl[i]!=NULL&&r->pl[i]->online == true) {
+					pler++;
+				}
+			}
+			cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << r->size << " Player: " << pler << "\n";
+		}
 	}
 	catch (...)
 	{

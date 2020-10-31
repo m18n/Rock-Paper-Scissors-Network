@@ -1,16 +1,12 @@
 #include "Room.h"
-void AddPlayer(Room* rm, Player** pl) {
-	bool search = false;
+void AddPlayer(Room* rm, Player* pl) {
 	for (int i = 0; i < rm->size; i++)
 	{
-		if (rm->pl[i]==NULL||(*rm->pl[i])->online == false) {
+		if (rm->pl[i]==NULL||rm->pl[i]->online == false) {
 			rm->pl[i] = pl;
-			search = true;
 			break;
 		}
 	}
-	if (search == false)
-		rm->pl.push_back(pl);
 }
 void CreateRoom(Room* rm, int size, int key, const char name[10]) {
 	rm->key = key;
@@ -34,7 +30,7 @@ void DeleteRoom(Room* rm) {
 	rm->key = 0;
 	rm->size = 0;
 	for (int i = 0; i < rm->pl.size(); i++) {
-		DeletePlayer(*rm->pl[i]);
+		DeletePlayer(rm->pl[i]);
 	}
 	rm->online = false;
 }
