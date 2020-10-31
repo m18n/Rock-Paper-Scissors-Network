@@ -22,6 +22,10 @@ struct Player
 void sendEx(Serwerconnect& sr, SOCKET& Connection, const char* buff, int size);
 void recvEx(Serwerconnect& sr, SOCKET& Connection, char* buff, int size);
 void Login(Player& pl, Serwerconnect& sr);
+void RoomSesions(char NameR[10],char KeyR) 
+{
+	cout << "Name Room: " << NameR <<"\n"<< " Key: " << KeyR << "\n";
+}
 void Options() 
 {
 	
@@ -44,7 +48,7 @@ void CreateRoom(Serwerconnect& sr) {
 	Sleep(100);
 	recvEx(sr, sr.Conection, keyroom, sizeof(keyroom));
 	system("cls");
-	cout << "Name Room: " << nameroom << " Key: " << keyroom << "\n";
+	RoomSesions( nameroom,keyroom[6]);
 }
 void ConnectRoom(Serwerconnect& sr) {
 	char key[2];
@@ -54,6 +58,7 @@ void ConnectRoom(Serwerconnect& sr) {
 	cin >> keyroom;
 	sendEx(sr, sr.Conection, key, 2);
 	sendEx(sr, sr.Conection,keyroom, strlen(keyroom)+1);
+
 }
 void SearchRoom(Serwerconnect& sr) {
 	char key[2];
