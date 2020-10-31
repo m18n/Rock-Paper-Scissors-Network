@@ -12,64 +12,94 @@ struct Serwerconnect
 	SOCKADDR_IN addr;
 	SOCKET Conection;
 };
+struct Player
+{
+	char login[20] = "";
+	int password = 0;
+	int score = 0;
+};
+
 void sendEx(Serwerconnect& sr, SOCKET& Connection, const char* buff, int size);
 void recvEx(Serwerconnect& sr, SOCKET& Connection, char* buff, int size);
+void Login(Player& pl, Serwerconnect& sr);
 void Options() 
 {
 	
 }
-void Conectroom(Serwerconnect& sr)
+void CreateRoom(Serwerconnect& sr) {
+	char key[2];
+	char playermax[4];
+	char nameroom[10];
+	char keyroom[6];
+	key[0] = 'r';
+	key[1] = '\0';
+	cout << "Room Name:";
+	cin >> nameroom;
+	cout << "Max Player:";
+	cin >> playermax;
+	sendEx(sr, sr.Conection, key, 2);
+	sendEx(sr, sr.Conection, nameroom, strlen(nameroom)+1);
+	Sleep(100);
+	sendEx(sr, sr.Conection, playermax, strlen(playermax) + 1);
+	Sleep(100);
+	recvEx(sr, sr.Conection, keyroom, sizeof(keyroom));
+	system("cls");
+	cout << "Name Room: " << nameroom << " Key: " << keyroom << "\n";
+}
+void ConnectRoom(Serwerconnect& sr) {
+	char key[2];
+	char keyroom[6];
+	key[0] = 'c';
+	cout << "Room key:";
+	cin >> keyroom;
+	sendEx(sr, sr.Conection, key, 2);
+	sendEx(sr, sr.Conection,keyroom, strlen(keyroom)+1);
+}
+void SearchRoom(Serwerconnect& sr) {
+	char key[2];
+	key[0] = 's';
+	sendEx(sr, sr.Conection, key, 2);
+}
+void MenuRoom(Serwerconnect& sr)
 {
 	int main_ConectRoom1;
 	string Nameroom;
 	char key[2];
 	int PlayerMax;
 	char KeyRoom[6];
-	cout << "Create Room-2\n";
-	cout <<"Search room-0\n" ;
-	cout << "ConectRoom-1\n";
+	cout << "Create Room-0\n";
+	cout <<"Search room-1\n" ;
+	cout << "ConectRoom-2\n";
 	cin >> main_ConectRoom1;
-	if (main_ConectRoom1==0)//Search room
+	switch (main_ConectRoom1)
 	{
-		key[0] = 's';
-		sendEx(sr, sr.Conection, key, 2);
-	}
-	else if (main_ConectRoom1==1)//Connect room
-	{
-		key[0] = 'c';
-		cout << "Room key:";
-		cin >> KeyRoom;
-		sendEx(sr, sr.Conection, key, 2);
-	}
-	else if (main_ConectRoom1==2)//create rooms
-	{
-		key[0] = 'r';
-		key[1] = '\0';
-		cout << "Room Name:";
-		cin >> Nameroom;
-		cout << "Max Player:";
-		cin >> PlayerMax;
-		sendEx(sr, sr.Conection, key, 2);
-		sendEx(sr,sr.Conection, Nameroom.c_str(), Nameroom.length()+1);
-		Sleep(100);
-		sendEx(sr, sr.Conection, to_string(PlayerMax).c_str(), to_string(PlayerMax).length() + 1);
-		Sleep(100);
-		recvEx(sr, sr.Conection,KeyRoom,sizeof(KeyRoom));
-		system("cls");
-		cout << Nameroom<<"\n";
-		cout << KeyRoom << "\n";
-	}
-	else 
-	{
+	case 0://Create rooms
+		CreateRoom(sr);
+		break;
+	case 1://Search Room
+		SearchRoom(sr);
+		break;
+	case 2://Connect Room
+		ConnectRoom(sr);
+		break;
+	default:
 		cout << "Error 2";
+		break;
 	}
+
 }
-void MainMenu(int MenuOptions, Serwerconnect& sr)
+void MainMenu( Serwerconnect& sr)
 {
+	int MenuOptions;
+	cout << "MainMenu\n";
+	cout << "PlayGame-0\n";
+	cout << "Options-1\n";
+	cout << "exit-2\n";
+	cin >> MenuOptions;
 	switch (MenuOptions)
 	{
 	case 0:
-		Conectroom(sr);
+		MenuRoom(sr);
 		break;
 	case 1:
 		Options();
@@ -82,12 +112,6 @@ void MainMenu(int MenuOptions, Serwerconnect& sr)
 		break;
 	}
 }
-struct Player
-{
-	char login[20]="";
-	int password = 0;
-	int score = 0;
-};
 void Inithilization(Serwerconnect& sr,string ip,int port) {
 	sr.DLLversion = MAKEWORD(2, 2);
 	if (WSAStartup(sr.DLLversion, &sr.wsaData) != 0) {
@@ -107,7 +131,7 @@ void Connect(Serwerconnect& sr)
 		closesocket(sr.Conection);
 		system("cls");
 		int choise;
-		cout << "Error:failed conect serwer\n"<<"Please restart you program\n"<<"1-conect\n"<<"0-exit\n";
+		cout << "Error:failed conect serwer\nPlease restart you program\n1-conect\n0-exit\n";
 		cin >> choise;
 		if (choise ==0)
 			exit(1);
@@ -229,12 +253,7 @@ int main() {
 	Connect(con);
 	Login(pl,con);
 	system("cls");
-	cout << "MainMenu\n";
-	cout << "PlayGame-0\n";
-	cout << "Options-1\n";
-	cout << "exit-2\n";
-	cin >> mainop;
-	MainMenu(mainop, con);
+	MainMenu(con);
 	system("pause");
 	return 0;
 }
