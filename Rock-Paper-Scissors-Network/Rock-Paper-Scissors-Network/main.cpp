@@ -162,46 +162,52 @@ bool SendUp(Serwerconnect& sr, string password, const char login[20]) {
 	else
 		return false;
 }
-void SingIn(Serwerconnect& sr, char login[20], int& password)
+void SingIn(Serwerconnect& sr,Player& pl)
 {
 	cout << "Login:";
-	cin >> login;
+	cin >> pl.login;
 	cout << "Password:";
-	cin >> password;
+	cin >> pl.password;
 	string paswordserwer;
-	paswordserwer = to_string(password);
-	bool res = SendIn(sr, paswordserwer.c_str(), login);
-	if (res == false){
+	paswordserwer = to_string(pl.password);
+	bool res = SendIn(sr, paswordserwer.c_str(), pl.login);
+	if (res == false)
+	{
 		cout << "Error:you computer alahatbar\n";
-	cout << "restart Sing In";
-	Sleep(550);
-	SingIn(sr,login,password);
+		Sleep(550);
+		system("cls");
+		Login(pl,sr);
 	}
 	else
 		cout << "Sucsesful\n";
 	Sleep(500);
 }
-void SingUp(Serwerconnect& sr,char login[20], int& password)
+void SingUp(Serwerconnect& sr,Player& pl)
 {
 	int password1=0;
 	string paswordserwer;
 	system("cls");
 	cout << "Login:";
-	cin >> login;
+	cin >> pl.login;
 	system("cls");
 	do
 	{
 		
 		cout << "Password:";
-		cin >> password;
+		cin >> pl.password;
 		cout << "Password:";
 		cin >> password1;
 		system("cls");
-	} while (password != password1);
-	paswordserwer = to_string(password);
-	bool res=SendUp(sr, paswordserwer, login);
+	} while (pl.password != password1);
+	paswordserwer = to_string(pl.password);
+	bool res=SendUp(sr, paswordserwer, pl.login);
 	if (res == false)
+	{
 		cout << "Error:you computer alahatbar\n";
+		Sleep(550);
+		system("cls");
+		Login(pl, sr);
+	}
 	else
 		cout << "Sucsesful\n";
 }
@@ -211,9 +217,9 @@ void Login(Player& pl, Serwerconnect& sr) {
 	cout << "Sing up-2\n";
 	cin >> choice;
 	if (choice == 1)
-		SingIn(sr,pl.login, pl.password);
+		SingIn(sr, pl);
 	else if (choice == 2)
-		SingUp(sr,pl.login, pl.password);
+		SingUp(sr, pl);
 }
 int main() {
 	Serwerconnect con;
