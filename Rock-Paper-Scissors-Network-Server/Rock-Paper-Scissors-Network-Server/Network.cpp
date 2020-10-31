@@ -1,5 +1,5 @@
 #include "Network.h"
-void ConnectSocket(Connect& cn, vector<Player*>& conn, void(*Handle)(Player& pl)) {
+void ConnectSocket(Connect& cn, vector<Player*>& conn, void(*Handle)(Player* pl)) {
 	SOCKET sListen = socket(AF_INET, SOCK_STREAM, NULL);
 	bind(sListen, (SOCKADDR*)&cn.addr, sizeof(cn.addr));
 	listen(sListen, SOMAXCONN);
@@ -40,18 +40,18 @@ void Inithilization(Connect& cn, string ip, short int port) {
 	cn.addr.sin_port = htons(port);
 	cn.addr.sin_family = AF_INET;
 }
-void sendEx(Player& pl, const char* buff, int size) {
-	int res = send(pl.connect, buff, size, NULL);
+void sendEx(Player* pl, const char* buff, int size) {
+	int res = send(pl->connect, buff, size, NULL);
 	if (res < 0) {
-		DeletePlayer(&pl);
+		DeletePlayer(pl);
 		cout << "Disconnet\n";
 		throw "Disconnect";
 	}
 }
-void recvEx(Player& pl, char* buff, int size) {
-	int res = recv(pl.connect, buff, size, NULL);
+void recvEx(Player* pl, char* buff, int size) {
+	int res = recv(pl->connect, buff, size, NULL);
 	if (res <= 0) {
-		DeletePlayer(&pl);
+		DeletePlayer(pl);
 		cout << "Disconnet\n";
 		throw "Disconnect";
 	}

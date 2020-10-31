@@ -12,7 +12,7 @@ struct Connect {
 	SOCKADDR_IN addr;
 	int sizeofaddr = 0;
 };
-void recvEx(Player& pl, char* buff, int size);
-void sendEx(Player& pl, const char* buff, int size);
+void recvEx(Player* pl, char* buff, int size);
+void sendEx(Player* pl, const char* buff, int size);
 void Inithilization(Connect& cn, string ip, short int port);
-void ConnectSocket(Connect& cn, vector<Player*>& conn, void(*Handle)(Player& pl));
+void ConnectSocket(Connect& cn, vector<Player*>& conn, void(*Handle)(Player* pl));

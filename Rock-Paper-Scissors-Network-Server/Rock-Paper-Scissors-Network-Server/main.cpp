@@ -3,6 +3,7 @@
 #include<vector>
 #include<WinSock2.h>
 #include<fstream>
+#include"string"
 #pragma warning(disable:4996)
 #pragma comment(lib,"ws2_32.lib")
 #include"Player.h"
@@ -10,22 +11,23 @@
 #include"Network.h"
 #include"Room.h"
 using namespace std;
-void SingIn(Player& pl,char password[20]) {
+vector<Room*>rm;
+void SingIn(Player* pl, char password[20]) {
 	char temp[20];
 	char score[10];
 	ifstream fi("BD_Player/Player.txt");
 	string temp2 = "";
-	while (temp2 != pl.login)//search login
+	while (temp2 != pl->login)//search login
 	{
 		if (fi.tellg() == -1)
 			break;
 		fi >> temp2;
 	}
-	if (temp2 != pl.login) {
+	if (temp2 != pl->login) {
 		strcpy_s(temp, "Error");
-		sendEx(pl, temp, strlen(temp)+1);
+		sendEx(pl, temp, strlen(temp) + 1);
 		strcpy_s(temp, "");
-		sendEx(pl, temp, strlen(temp)+1);
+		sendEx(pl, temp, strlen(temp) + 1);
 	}
 	else {
 		fi >> temp2;
@@ -33,13 +35,13 @@ void SingIn(Player& pl,char password[20]) {
 		fi >> score;
 		fi >> score;
 		if (strcmp(temp2.c_str(), password) != 0) {
-			strcpy_s(pl.login, "");
-			pl.password = 0;
+			strcpy_s(pl->login, "");
+			pl->password = 0;
 			strcpy_s(temp, "Error");
 			strcpy_s(score, "");
 		}
 		else {
-			pl.password = atoi(password);
+			pl->password = atoi(password);
 			strcpy_s(temp, "ok");
 		}
 		sendEx(pl, temp, strlen(temp) + 1);
@@ -47,54 +49,97 @@ void SingIn(Player& pl,char password[20]) {
 	}
 	fi.close();
 }
-void SingUp(Player& pl, char password[20]) {
+int SearchRoom(int keyroom) {
+	for (int i = 0; i < rm.size(); i++)
+	{
+		if (rm[i]->key == keyroom) {
+			return i;
+		}
+	}
+}
+void Menu(Player* pl) {
+	char key[2];
+	char name[10];
+	char maxplayer[4];
+	char keyroom[6];
+	recvEx(pl, key, sizeof(key));
+	if (key[0] == 'r') {//create
+		recvEx(pl, name, sizeof(name));
+		recvEx(pl, maxplayer, sizeof(maxplayer));
+		Room* r = new Room;
+		CreateRoom(r, atoi(maxplayer), 0, name);
+		GenertyKey(rm, r);
+		AddRoom(rm, r);
+		strcpy_s(keyroom, to_string(r->key).c_str());
+		sendEx(pl, keyroom, sizeof(keyroom));
+		cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << maxplayer << "\n";
+	}
+	else if (key[0] == 's') {//search
+
+	}
+	else if (key[0] == 'c') {//connect
+		recvEx(pl, keyroom, sizeof(keyroom));
+		Room* r = rm[SearchRoom(atoi(keyroom))];
+		AddPlayer(r, &pl);
+		int pler = 0;
+		for (int i = 0; i < r->size; i++) {
+			if ((*r->pl[i])->online == true) {
+				pler++;
+			}
+
+		}
+		cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << maxplayer << " Player: " << pler << "\n";
+	}
+}
+void SingUp(Player* pl, char password[20]) {
 	ifstream fi("BD_Player/Player.txt");
 	ofstream fs;
 	char temp[10];
 	string temp2 = "";
-	while (temp2 != pl.login) {
-		if (fi.tellg() ==-1)
+	while (temp2 != pl->login) {
+		if (fi.tellg() == -1)
 			break;
 		fi >> temp2;
 	}
-	if (temp2 == pl.login)
+	if (temp2 == pl->login)
 		strcpy_s(temp, "Error");
 	else {
 		strcpy_s(temp, "ok");
 		fs.open("BD Player/Player.txt", ios_base::app);
-		fs << "Login: " << pl.login << " Password: " << password << " Score: 0" << "\n";
+		fs << "Login: " << pl->login << " Password: " << password << " Score: 0" << "\n";
 		fs.close();
 		fi.close();
 	}
-	sendEx(pl, temp, strlen(temp)+1);
-	
+	sendEx(pl, temp, strlen(temp) + 1);
+
 }
-void Login(Player& pl) {
+void Login(Player* pl) {
 	char password[20];
 	char key[2];
-	int size = sizeof(pl.login);
+	int size = sizeof(pl->login);
 	try {
 		recvEx(pl, key, sizeof(key));
-		recvEx(pl, pl.login, size);
+		recvEx(pl, pl->login, size);
 		recvEx(pl, password, sizeof(password));
 	}
-	catch(...){
+	catch (...) {
 		return;
 	}
 	if (key[0] == 'i') {
-		SingIn(pl,password);
+		SingIn(pl, password);
+		Menu(pl);
 	}
-	else if(key[0]=='u') {
-		SingUp(pl,password);
+	else if (key[0] == 'u') {
+		SingUp(pl, password);
 	}
 }
 int main() {
 	vector<Player*>conn;
-	vector<Room*>rm;
+
 	cout << "start server\n";
 	Connect cn;
-	Inithilization(cn, "192.168.0.103", 9999);
-	ConnectSocket(cn,conn,Login);
+	Inithilization(cn, "192.168.0.104", 9999);
+	ConnectSocket(cn, conn, Login);
 	system("pause");
 	return 0;
 }
