@@ -12,6 +12,8 @@ struct Serwerconnect
 	SOCKADDR_IN addr;
 	SOCKET Conection;
 };
+void sendEx(Serwerconnect& sr, SOCKET& Connection, const char* buff, int size);
+void recvEx(Serwerconnect& sr, SOCKET& Connection, char* buff, int size);
 void Options() 
 {
 	
@@ -20,32 +22,42 @@ void Conectroom(Serwerconnect& sr)
 {
 	int main_ConectRoom1;
 	string Nameroom;
+	char key[2];
 	int PlayerMax;
 	char KeyRoom[6];
 	cout << "Create Room-2\n";
 	cout <<"Search room-0\n" ;
 	cout << "ConectRoom-1\n";
 	cin >> main_ConectRoom1;
-	if (main_ConectRoom1==0)
+	if (main_ConectRoom1==0)//Search room
 	{
-	
+		key[0] = 's';
+		sendEx(sr, sr.Conection, key, 2);
 	}
-	else if (main_ConectRoom1==1)
+	else if (main_ConectRoom1==1)//Conect room
 	{
-		cout << "Room key";
+		key[0] = 'c';
+		cout << "Room key:";
 		cin >> KeyRoom;
+		sendEx(sr, sr.Conection, key, 2);
 	}
-	else if (main_ConectRoom1==2)
+	else if (main_ConectRoom1==2)//create rooms
 	{
-		cout << "Room Name";
+		key[0] = 'r';
+		key[1] = '\0';
+		cout << "Room Name:";
 		cin >> Nameroom;
-		cout << "Max Player";
+		cout << "Max Player:";
 		cin >> PlayerMax;
-
+		sendEx(sr, sr.Conection, key, 2);
 		sendEx(sr,sr.Conection, Nameroom.c_str(), Nameroom.length()+1);
+		Sleep(100);
 		sendEx(sr, sr.Conection, to_string(PlayerMax).c_str(), to_string(PlayerMax).length() + 1);
 		Sleep(100);
 		recvEx(sr, sr.Conection,KeyRoom,sizeof(KeyRoom));
+		system("cls");
+		cout << Nameroom<<"\n";
+		cout << KeyRoom << "\n";
 	}
 	else 
 	{
@@ -204,7 +216,6 @@ void Login(Player& pl, Serwerconnect& sr) {
 	else if (choice == 2)
 		SingUp(sr,pl.login, pl.password);
 }
-
 int main() {
 	Serwerconnect con;
 	Player pl;
