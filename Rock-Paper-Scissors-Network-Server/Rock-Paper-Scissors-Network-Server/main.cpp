@@ -12,11 +12,12 @@
 #include"Room.h"
 using namespace std;
 vector<Room*>rm;
-void SingIn(Player* pl, char password[20]) {
+bool SingIn(Player* pl, char password[20]) {
 	char temp[20];
 	char score[10];
 	ifstream fi("BD_Player/Player.txt");
 	string temp2 = "";
+	bool suc = false;
 	while (temp2 != pl->login)//search login
 	{
 		if (fi.tellg() == -1)
@@ -43,11 +44,13 @@ void SingIn(Player* pl, char password[20]) {
 		else {
 			pl->password = atoi(password);
 			strcpy_s(temp, "ok");
+			suc = true;
 		}
 		sendEx(pl, temp, strlen(temp) + 1);
 		sendEx(pl, score, strlen(score) + 1);
 	}
 	fi.close();
+	return suc;
 }
 int SearchRoom(int keyroom) {
 	for (int i = 0; i < rm.size(); i++)
@@ -91,9 +94,10 @@ void Menu(Player* pl) {
 		cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << maxplayer << " Player: " << pler << "\n";
 	}
 }
-void SingUp(Player* pl, char password[20]) {
+bool SingUp(Player* pl, char password[20]) {
 	ifstream fi("BD_Player/Player.txt");
 	ofstream fs;
+	bool suc = false;
 	char temp[10];
 	string temp2 = "";
 	while (temp2 != pl->login) {
@@ -109,13 +113,15 @@ void SingUp(Player* pl, char password[20]) {
 		fs << "Login: " << pl->login << " Password: " << password << " Score: 0" << "\n";
 		fs.close();
 		fi.close();
+		suc = true;
 	}
 	sendEx(pl, temp, strlen(temp) + 1);
-
+	return suc;
 }
-void Login(Player* pl) {
+int Login(Player* pl) {
 	char password[20];
 	char key[2];
+	bool suc = false;
 	int size = sizeof(pl->login);
 	try {
 		recvEx(pl, key, sizeof(key));
@@ -123,14 +129,25 @@ void Login(Player* pl) {
 		recvEx(pl, password, sizeof(password));
 	}
 	catch (...) {
-		return;
+		return 3;
 	}
 	if (key[0] == 'i') {
-		SingIn(pl, password);
+		suc=SingIn(pl, password);
+		if(suc==false)
+			return suc;
 		Menu(pl);
 	}
 	else if (key[0] == 'u') {
-		SingUp(pl, password);
+		suc=SingUp(pl, password);
+	}
+	return suc;
+}
+void Meneger(Player* pl) {
+	int suc=0;
+	while (suc != 1) {
+		suc = Login(pl);
+		if (suc == 3)
+			return;
 	}
 }
 int main() {
@@ -139,7 +156,7 @@ int main() {
 	cout << "start server\n";
 	Connect cn;
 	Inithilization(cn, "192.168.0.104", 9999);
-	ConnectSocket(cn, conn, Login);
+	ConnectSocket(cn, conn, Meneger);
 	system("pause");
 	return 0;
 }
