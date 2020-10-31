@@ -65,6 +65,8 @@ void Menu(Player* pl) {
 	char name[10];
 	char maxplayer[4];
 	char keyroom[6];
+	try
+	{
 	recvEx(pl, key, sizeof(key));
 	if (key[0] == 'r') {//create
 		recvEx(pl, name, sizeof(name));
@@ -86,12 +88,17 @@ void Menu(Player* pl) {
 		AddPlayer(r, &pl);
 		int pler = 0;
 		for (int i = 0; i < r->size; i++) {
-			if ((*r->pl[i])->online == true) {
+			if (r->pl[i]!=NULL&&(*r->pl[i])->online == true) {
 				pler++;
 			}
 
 		}
-		cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << maxplayer << " Player: " << pler << "\n";
+		cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << r->size << " Player: " << pler << "\n";
+	}
+	}
+	catch (...)
+	{
+		return;
 	}
 }
 bool SingUp(Player* pl, char password[20]) {
@@ -109,7 +116,7 @@ bool SingUp(Player* pl, char password[20]) {
 		strcpy_s(temp, "Error");
 	else {
 		strcpy_s(temp, "ok");
-		fs.open("BD Player/Player.txt", ios_base::app);
+		fs.open("BD_Player/Player.txt", ios_base::app);
 		fs << "Login: " << pl->login << " Password: " << password << " Score: 0" << "\n";
 		fs.close();
 		fi.close();
@@ -131,15 +138,10 @@ int Login(Player* pl) {
 	catch (...) {
 		return 3;
 	}
-	if (key[0] == 'i') {
+	if (key[0] == 'i') 
 		suc=SingIn(pl, password);
-		if(suc==false)
-			return suc;
-		Menu(pl);
-	}
-	else if (key[0] == 'u') {
+	else if (key[0] == 'u')
 		suc=SingUp(pl, password);
-	}
 	return suc;
 }
 void Meneger(Player* pl) {
@@ -149,6 +151,7 @@ void Meneger(Player* pl) {
 		if (suc == 3)
 			return;
 	}
+	Menu(pl);
 }
 int main() {
 	vector<Player*>conn;

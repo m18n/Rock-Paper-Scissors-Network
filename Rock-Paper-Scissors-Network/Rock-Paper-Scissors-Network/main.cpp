@@ -41,7 +41,6 @@ void CreateRoom(Serwerconnect& sr) {
 	sendEx(sr, sr.Conection, nameroom, strlen(nameroom)+1);
 	Sleep(100);
 	sendEx(sr, sr.Conection, playermax, strlen(playermax) + 1);
-	Sleep(100);
 	recvEx(sr, sr.Conection, keyroom, sizeof(keyroom));
 	system("cls");
 	cout << "Name Room: " << nameroom << " Key: " << keyroom << "\n";
@@ -96,6 +95,7 @@ void MainMenu( Serwerconnect& sr)
 	cout << "Options-1\n";
 	cout << "exit-2\n";
 	cin >> MenuOptions;
+	system("cls");
 	switch (MenuOptions)
 	{
 	case 0:

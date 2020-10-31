@@ -3,7 +3,7 @@ void AddPlayer(Room* rm, Player** pl) {
 	bool search = false;
 	for (int i = 0; i < rm->size; i++)
 	{
-		if ((*rm->pl[i])->online == false) {
+		if (rm->pl[i]==NULL||(*rm->pl[i])->online == false) {
 			rm->pl[i] = pl;
 			search = true;
 			break;
