@@ -34,7 +34,7 @@ void Conectroom(Serwerconnect& sr)
 		key[0] = 's';
 		sendEx(sr, sr.Conection, key, 2);
 	}
-	else if (main_ConectRoom1==1)//Conect room
+	else if (main_ConectRoom1==1)//Connect room
 	{
 		key[0] = 'c';
 		cout << "Room key:";
@@ -66,21 +66,20 @@ void Conectroom(Serwerconnect& sr)
 }
 void MainMenu(int MenuOptions, Serwerconnect& sr)
 {
-	if (MenuOptions==0)
+	switch (MenuOptions)
 	{
+	case 0:
 		Conectroom(sr);
-	}
-	else if (MenuOptions == 1)
-	{
+		break;
+	case 1:
 		Options();
-	}
-	else if (MenuOptions == 2)
-	{
+		break;
+	case 2:
 		exit(1);
-	}
-	else
-	{
+		break;
+	default:
 		cout << "Error 2";
+		break;
 	}
 }
 struct Player
