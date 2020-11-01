@@ -41,7 +41,16 @@ void Inithilization(Connect& cn, string ip, short int port) {
 	cn.addr.sin_family = AF_INET;
 }
 int sendEx(Player* pl, const char* buff, int size) {
-	int res = send(pl->connect, buff, size, NULL);
+	int res = 0;
+	char number[5];
+	strcpy_s(number, to_string(size).c_str());
+	res = send(pl->connect, number, strlen(number)+1, NULL);
+	if (res < 0) {
+		DeletePlayer(pl);
+		cout << "Disconnet\n";
+		throw "Disconnect";
+	}
+	res = send(pl->connect, buff, size, NULL);
 	if (res < 0) {
 		DeletePlayer(pl);
 		cout << "Disconnet\n";
@@ -50,7 +59,16 @@ int sendEx(Player* pl, const char* buff, int size) {
 	return res;
 }
 int recvEx(Player* pl, char* buff, int size) {
-	int res = recv(pl->connect, buff, size, NULL);
+	char number[5];
+	int res;
+	res=recv(pl->connect, number, sizeof(number), NULL);
+	if (res <= 0) {
+		DeletePlayer(pl);
+		cout << "Disconnet\n";
+		throw "Disconnect";
+	}
+	size =atoi(number);
+	res = recv(pl->connect, buff, size, NULL);
 	if (res <= 0) {
 		DeletePlayer(pl);
 		cout << "Disconnet\n";
