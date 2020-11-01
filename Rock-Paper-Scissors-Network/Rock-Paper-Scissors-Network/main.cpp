@@ -17,14 +17,28 @@ struct Player
 	char login[20] = "";
 	int password = 0;
 	int score = 0;
+	bool ready=false;
 };
-
 void sendEx(Serwerconnect& sr, SOCKET& Connection, const char* buff, int size);
 void recvEx(Serwerconnect& sr, SOCKET& Connection, char* buff, int size);
 void Login(Player& pl, Serwerconnect& sr);
-void RoomSesions(char NameR[10],char KeyR) 
+void GetNotification(Serwerconnect& sr)
 {
+	char bufer[30];
+	char maxPlayer[4];
+	recvEx(sr, sr.Conection, maxPlayer, sizeof(maxPlayer));
+	int Player = atoi(maxPlayer);
+	for (int i = 0; i < Player; i++)
+	{
+		recvEx(sr, sr.Conection, bufer, sizeof(bufer));
+		cout << bufer<<"\n";
+	}
+}
+void RoomSesions(char NameR[10],char KeyR[6], Serwerconnect& sr)
+{
+	system("cls");
 	cout << "Name Room: " << NameR <<"\n"<< " Key: " << KeyR << "\n";
+	GetNotification(sr);
 }
 void Options() 
 {
@@ -47,10 +61,10 @@ void CreateRoom(Serwerconnect& sr) {
 	sendEx(sr, sr.Conection, playermax, strlen(playermax) + 1);
 	Sleep(100);
 	recvEx(sr, sr.Conection, keyroom, sizeof(keyroom));
-	system("cls");
-	RoomSesions( nameroom,keyroom[6]);
+	RoomSesions( nameroom,keyroom,sr);
 }
 void ConnectRoom(Serwerconnect& sr) {
+	char NR[10];
 	char key[2];
 	char keyroom[6];
 	key[0] = 'c';
@@ -58,6 +72,8 @@ void ConnectRoom(Serwerconnect& sr) {
 	cin >> keyroom;
 	sendEx(sr, sr.Conection, key, 2);
 	sendEx(sr, sr.Conection,keyroom, strlen(keyroom)+1);
+	recvEx(sr, sr.Conection, NR , 10);
+	RoomSesions(NR,keyroom,sr);
 
 }
 void SearchRoom(Serwerconnect& sr) {
