@@ -210,7 +210,7 @@ int recvEx(Serwerconnect& sr, SOCKET& Connection,char* buff, int size) {
 		Connect(sr);
 		return -1;
 	}
-	int index = SearchLen(buff, size, "Len:");
+	int index =SearchLen(buff, size, "Len:");
 	if (index != -1) {
 		int i;
 		for (i = index; i < size; i++)
