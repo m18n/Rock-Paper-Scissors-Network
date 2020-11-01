@@ -19,19 +19,22 @@ struct Player
 	int score = 0;
 	bool ready=false;
 };
-void sendEx(Serwerconnect& sr, SOCKET& Connection, const char* buff, int size);
-void recvEx(Serwerconnect& sr, SOCKET& Connection, char* buff, int size);
+int sendEx(Serwerconnect& sr, SOCKET& Connection, const char* buff, int size);
+int recvEx(Serwerconnect& sr, SOCKET& Connection, char* buff, int size);
 void Login(Player& pl, Serwerconnect& sr);
 void GetNotification(Serwerconnect& sr)
 {
+	int size;
 	char bufer[30];
 	char maxPlayer[4];
 	recvEx(sr, sr.Conection, maxPlayer, sizeof(maxPlayer));
 	int Player = atoi(maxPlayer);
 	for (int i = 0; i < Player; i++)
 	{
-		recvEx(sr, sr.Conection, bufer, sizeof(bufer));
+
+		size=recvEx(sr, sr.Conection, bufer, sizeof(bufer));
 		cout << bufer<<"\n";
+		cout<<size <<"\n";
 	}
 }
 void RoomSesions(char NameR[10],char KeyR[6], Serwerconnect& sr)
@@ -160,25 +163,28 @@ void Connect(Serwerconnect& sr)
 			Connect(sr);
 	}
 }
-void sendEx(Serwerconnect& sr,SOCKET& Connection,const char* buff,int size) {
+int sendEx(Serwerconnect& sr,SOCKET& Connection,const char* buff,int size) {
 	int result= send(Connection, buff, size, NULL);
 	if (result == SOCKET_ERROR) {
 		printf("send failed: %d\n", WSAGetLastError());
 		closesocket(Connection);
 		system("cls");
 		Connect(sr);
-		return;
+		return -1;
+		
 	}
+	return result;
 }
-void recvEx(Serwerconnect& sr, SOCKET& Connection,char* buff, int size) {
+int recvEx(Serwerconnect& sr, SOCKET& Connection,char* buff, int size) {
 	int result = recv(Connection, buff, size, NULL);
 	if (result == SOCKET_ERROR) {
 		printf("send failed: %d\n", WSAGetLastError());
 		closesocket(Connection);
 		system("cls");
 		Connect(sr);
-		return;
+		return -1;
 	}
+	return result;
 }
 bool SendIn(Serwerconnect& sr,const char passwordchar[20],const char login[20]) {
 	char temp[20];
