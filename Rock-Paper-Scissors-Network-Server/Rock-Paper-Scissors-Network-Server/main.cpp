@@ -76,7 +76,6 @@ void ConnectRoom(Player* pl, Room** r) {
 	sendEx(pl, (*r)->name, strlen((*r)->name)+1);
 	AddPlayer(*r, pl);
 	int pler = NumberPlayerRoom(*r);
-	cout << "Room: " << (*r)->key << " Name: " << (*r)->name << " Maxplayer: " << (*r)->size << " Player: " << pler << "\n";
 }
 void CreteRoom(Player* pl,Room* r) {
 	char name[10];
@@ -98,12 +97,14 @@ bool Notification(Room* r) {
 	int number = NumberPlayerRoom(r);
 	strcpy_s(maxplayer,to_string(number).c_str());
 	int index = 0;
+	int size = 0;
 	try
 	{
 		for (int i = 0; i < r->size; i++) {
 			if (r->pl[i] != NULL && r->pl[i]->online == true) {
 				index = i;
-				sendEx(r->pl[i], maxplayer, strlen(maxplayer) + 1);
+				size=sendEx(r->pl[i], maxplayer, strlen(maxplayer) + 1);
+				cout << "Size: " << size<<"\n";
 				for (int j = 0; j < r->size; j++) {
 					if (r->pl[j] != NULL && r->pl[j]->online == true) {
 						strcpy(buff, "Name: ");
@@ -113,8 +114,9 @@ bool Notification(Room* r) {
 							strcat(buff, "true");
 						else
 							strcat(buff, "false");
-						index = j;
-						sendEx(r->pl[i],buff,strlen(buff)+1);
+						index = i;
+						size=sendEx(r->pl[i],buff,strlen(buff)+1);
+						cout << "Size: " << size << "\n";
 					}
 				}
 			}
@@ -146,6 +148,8 @@ void Menu(Player* pl) {
 			while (temp != true) {
 				temp = Notification(r);
 			}
+			int player = NumberPlayerRoom(r);
+			cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << r->size << " Player: " << player << "\n";
 		}
 	}
 	catch (...)

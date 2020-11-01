@@ -40,19 +40,21 @@ void Inithilization(Connect& cn, string ip, short int port) {
 	cn.addr.sin_port = htons(port);
 	cn.addr.sin_family = AF_INET;
 }
-void sendEx(Player* pl, const char* buff, int size) {
+int sendEx(Player* pl, const char* buff, int size) {
 	int res = send(pl->connect, buff, size, NULL);
 	if (res < 0) {
 		DeletePlayer(pl);
 		cout << "Disconnet\n";
 		throw "Disconnect";
 	}
+	return res;
 }
-void recvEx(Player* pl, char* buff, int size) {
+int recvEx(Player* pl, char* buff, int size) {
 	int res = recv(pl->connect, buff, size, NULL);
 	if (res <= 0) {
 		DeletePlayer(pl);
 		cout << "Disconnet\n";
 		throw "Disconnect";
 	}
+	return res;
 }

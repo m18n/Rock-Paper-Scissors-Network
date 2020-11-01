@@ -24,6 +24,7 @@ void recvEx(Serwerconnect& sr, SOCKET& Connection, char* buff, int size);
 void Login(Player& pl, Serwerconnect& sr);
 void GetNotification(Serwerconnect& sr)
 {
+	cout << "Notifaction\n";
 	char bufer[30];
 	char maxPlayer[4];
 	recvEx(sr, sr.Conection, maxPlayer, sizeof(maxPlayer));
