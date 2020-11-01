@@ -8,5 +8,6 @@ struct Player {
 	int score = 0;
 	SOCKET connect = NULL;
 	bool online = false;
+	bool ready = false;
 };
 void DeletePlayer(Player* pl);

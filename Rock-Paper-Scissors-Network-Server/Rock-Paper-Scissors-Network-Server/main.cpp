@@ -60,39 +60,93 @@ int SearchRoom(int keyroom) {
 		}
 	}
 }
-void Menu(Player* pl) {
-	char key[2];
+int NumberPlayerRoom(Room* r) {
+	int player = 0;
+	for (int i = 0; i < r->size; i++) {
+		if (r->pl[i] != NULL && r->pl[i]->online == true) {
+			player++;
+		}
+	}
+	return player;
+}
+void ConnectRoom(Player* pl, Room* r) {
+	char keyroom[6];
+	recvEx(pl, keyroom, sizeof(keyroom));
+	r = rm[SearchRoom(atoi(keyroom))];
+	sendEx(pl, r->name, strlen(r->name)+1);
+	AddPlayer(r, pl);
+	int pler = NumberPlayerRoom(r);
+	cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << r->size << " Player: " << pler << "\n";
+}
+void CreteRoom(Player* pl,Room* r) {
 	char name[10];
 	char maxplayer[4];
 	char keyroom[6];
+	recvEx(pl, name, sizeof(name));
+	recvEx(pl, maxplayer, sizeof(maxplayer));
+	CreateRoom(r, atoi(maxplayer), 0, name);
+	GenertyKey(rm, r);
+	AddRoom(rm, r);
+	AddPlayer(r, pl);
+	strcpy_s(keyroom, to_string(r->key).c_str());
+	sendEx(pl, keyroom, strlen(keyroom)+1);
+	cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << maxplayer << "\n";
+}
+
+bool Notification(Room* r) {
+	char buff[30];
+	char maxplayer[4];
+	int number = NumberPlayerRoom(r);
+	strcpy_s(maxplayer,to_string(number).c_str());
+	int index = 0;
+	try
+	{
+		for (int i = 0; i < r->size; i++) {
+			if (r->pl[i] != NULL && r->pl[i]->online == true) {
+				index = i;
+				sendEx(r->pl[i], maxplayer, strlen(maxplayer) + 1);
+				for (int j = 0; j < r->size; i++) {
+					if (r->pl[j] != NULL && r->pl[j]->online == true) {
+						strcpy(buff, "Name: ");
+						strcat(buff, r->pl[i]->login);
+						strcat(buff, " Ready: ");
+						if(r->pl[j]->ready==true)
+							strcat(buff, "true");
+						else
+							strcat(buff, "false");
+						index = j;
+						sendEx(r->pl[j],buff,strlen(buff)+1);
+					}
+				}
+			}
+		}
+	}
+	catch (...)
+	{
+		DeletePlayer(r->pl[index]);
+		return false;
+	}
+	return true;
+}
+void Menu(Player* pl) {
+	char key[2];
 	try
 	{
 		recvEx(pl, key, sizeof(key));
 		if (key[0] == 'r') {//create
-			recvEx(pl, name, sizeof(name));
-			recvEx(pl, maxplayer, sizeof(maxplayer));
 			Room* r = new Room;
-			CreateRoom(r, atoi(maxplayer), 0, name);
-			GenertyKey(rm, r);
-			AddRoom(rm, r);
-			strcpy_s(keyroom, to_string(r->key).c_str());
-			sendEx(pl, keyroom, sizeof(keyroom));
-			cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << maxplayer << "\n";
+			CreteRoom(pl,r);
 		}
 		else if (key[0] == 's') {//search
 
 		}
 		else if (key[0] == 'c') {//connect
-			recvEx(pl, keyroom, sizeof(keyroom));
-			Room* r = rm[SearchRoom(atoi(keyroom))];
-			AddPlayer(r, pl);
-			int pler = 0;
-			for (int i = 0; i < r->size; i++) {
-				if (r->pl[i]!=NULL&&r->pl[i]->online == true) {
-					pler++;
-				}
+			Room* r=NULL;
+			ConnectRoom(pl,r);
+			bool temp=false;
+			while (temp != true) {
+				temp = Notification(r);
 			}
-			cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << r->size << " Player: " << pler << "\n";
 		}
 	}
 	catch (...)
