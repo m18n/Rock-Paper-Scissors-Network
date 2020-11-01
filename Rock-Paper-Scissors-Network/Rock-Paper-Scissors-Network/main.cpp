@@ -19,20 +19,23 @@ struct Player
 	int score = 0;
 	bool ready=false;
 };
-void sendEx(Serwerconnect& sr, SOCKET& Connection, const char* buff, int size);
-void recvEx(Serwerconnect& sr, SOCKET& Connection, char* buff, int size);
+int sendEx(Serwerconnect& sr, SOCKET& Connection, const char* buff, int size);
+int recvEx(Serwerconnect& sr, SOCKET& Connection, char* buff, int size);
 void Login(Player& pl, Serwerconnect& sr);
 void GetNotification(Serwerconnect& sr)
 {
 	cout << "Notifaction\n";
+	int size;
 	char bufer[30];
 	char maxPlayer[4];
 	recvEx(sr, sr.Conection, maxPlayer, sizeof(maxPlayer));
 	int Player = atoi(maxPlayer);
 	for (int i = 0; i < Player; i++)
 	{
-		recvEx(sr, sr.Conection, bufer, sizeof(bufer));
+
+		size=recvEx(sr, sr.Conection, bufer, sizeof(bufer));
 		cout << bufer<<"\n";
+		cout<<size <<"\n";
 	}
 }
 void RoomSesions(char NameR[10],char KeyR[6], Serwerconnect& sr)
@@ -161,25 +164,83 @@ void Connect(Serwerconnect& sr)
 			Connect(sr);
 	}
 }
-void sendEx(Serwerconnect& sr,SOCKET& Connection,const char* buff,int size) {
-	int result= send(Connection, buff, size, NULL);
+int sendEx(Serwerconnect& sr,SOCKET& Connection,const char* buff,int size) {
+	int result;
+	result= send(Connection, buff, size, NULL);
 	if (result == SOCKET_ERROR) {
 		printf("send failed: %d\n", WSAGetLastError());
 		closesocket(Connection);
 		system("cls");
 		Connect(sr);
-		return;
+		return -1;
+		
 	}
+	return result;
 }
-void recvEx(Serwerconnect& sr, SOCKET& Connection,char* buff, int size) {
-	int result = recv(Connection, buff, size, NULL);
+int SearchLen(char* buff, int size,const char* search) {
+	bool searchb = false;
+	int index = 0;
+	int sizes = strlen(search);
+	int i;
+	for (i = 0; i < size; i++) {
+		if (buff[i] == search[index]) {
+			searchb = true;
+			
+			if (sizes == index)
+				break;
+			index++;
+		}
+		else {
+			index = 0;
+			searchb = false;
+		}
+	}
+	if (searchb == true)
+		return i;
+	else
+		return -1;
+}
+int recvEx(Serwerconnect& sr, SOCKET& Connection,char* buff, int size) {
+	int result;
+	result = recv(Connection, buff, size, NULL);
 	if (result == SOCKET_ERROR) {
 		printf("send failed: %d\n", WSAGetLastError());
 		closesocket(Connection);
 		system("cls");
 		Connect(sr);
-		return;
+		return -1;
 	}
+	int index = SearchLen(buff, size, "Len:");
+	if (index != -1) {
+		int i;
+		for (i = index; i < size; i++)
+		{
+			if (buff[i] == ' ')
+				break;
+		}
+		if (i != size) {
+			char* len = new char[i-index];
+			for (int j = index; j < i; j++) {
+				len[j - index] = buff[j];
+			}
+			int leni = atoi(len);
+			delete[] len;
+			if (leni != result) {
+				int raz = result - leni;
+				char* dobor = new char[raz];
+				recv(Connection,dobor,raz,NULL);
+				
+				char* all = new char[leni];
+				strcpy_s(all,result, buff);
+				strcat_s(all,result+raz,dobor);
+				strcpy_s(buff, result + raz,all);
+				delete[] dobor;
+				delete[] all;
+			}
+		}
+	}
+	
+	return result;
 }
 bool SendIn(Serwerconnect& sr,const char passwordchar[20],const char login[20]) {
 	char temp[20];
