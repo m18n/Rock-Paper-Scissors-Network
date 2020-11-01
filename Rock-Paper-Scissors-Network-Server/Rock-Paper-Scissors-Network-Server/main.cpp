@@ -69,14 +69,14 @@ int NumberPlayerRoom(Room* r) {
 	}
 	return player;
 }
-void ConnectRoom(Player* pl, Room* r) {
+void ConnectRoom(Player* pl, Room** r) {
 	char keyroom[6];
 	recvEx(pl, keyroom, sizeof(keyroom));
-	r = rm[SearchRoom(atoi(keyroom))];
-	sendEx(pl, r->name, strlen(r->name)+1);
-	AddPlayer(r, pl);
-	int pler = NumberPlayerRoom(r);
-	cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << r->size << " Player: " << pler << "\n";
+	*r = rm[SearchRoom(atoi(keyroom))];
+	sendEx(pl, (*r)->name, strlen((*r)->name)+1);
+	AddPlayer(*r, pl);
+	int pler = NumberPlayerRoom(*r);
+	cout << "Room: " << (*r)->key << " Name: " << (*r)->name << " Maxplayer: " << (*r)->size << " Player: " << pler << "\n";
 }
 void CreteRoom(Player* pl,Room* r) {
 	char name[10];
@@ -92,7 +92,6 @@ void CreteRoom(Player* pl,Room* r) {
 	sendEx(pl, keyroom, strlen(keyroom)+1);
 	cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << maxplayer << "\n";
 }
-
 bool Notification(Room* r) {
 	char buff[30];
 	char maxplayer[4];
@@ -105,17 +104,17 @@ bool Notification(Room* r) {
 			if (r->pl[i] != NULL && r->pl[i]->online == true) {
 				index = i;
 				sendEx(r->pl[i], maxplayer, strlen(maxplayer) + 1);
-				for (int j = 0; j < r->size; i++) {
+				for (int j = 0; j < r->size; j++) {
 					if (r->pl[j] != NULL && r->pl[j]->online == true) {
 						strcpy(buff, "Name: ");
-						strcat(buff, r->pl[i]->login);
+						strcat(buff, r->pl[j]->login);
 						strcat(buff, " Ready: ");
 						if(r->pl[j]->ready==true)
 							strcat(buff, "true");
 						else
 							strcat(buff, "false");
 						index = j;
-						sendEx(r->pl[j],buff,strlen(buff)+1);
+						sendEx(r->pl[i],buff,strlen(buff)+1);
 					}
 				}
 			}
@@ -142,7 +141,7 @@ void Menu(Player* pl) {
 		}
 		else if (key[0] == 'c') {//connect
 			Room* r=NULL;
-			ConnectRoom(pl,r);
+			ConnectRoom(pl,&r);
 			bool temp=false;
 			while (temp != true) {
 				temp = Notification(r);
