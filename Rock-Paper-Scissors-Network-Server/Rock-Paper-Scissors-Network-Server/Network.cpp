@@ -42,20 +42,7 @@ void Inithilization(Connect& cn, string ip, short int port) {
 }
 int sendEx(Player* pl,const char* buff, int size) {
 	int res = 0;
-	int sizenow = 0;
-	string sizestr = to_string(size);
-	int sizebuf = size + sizestr.length() + 5;
-	char* buffer = new char[sizebuf];
-	sizenow = 5;
-	strcpy_s(buffer, sizenow, "Len:");
-	sizenow += sizestr.length();
-	strcat_s(buffer,sizenow,sizestr.c_str());
-	sizenow += 1;
-	strcat_s(buffer,sizenow," ");
-	sizenow += size-1;
-	strcat_s(buffer,sizenow,buff);
-	res = send(pl->connect, buffer, sizebuf, NULL);
-	delete[] buffer;
+	res = send(pl->connect, buff, size, NULL);
 	if (res < 0) {
 		DeletePlayer(pl);
 		cout << "Disconnet\n";
@@ -66,7 +53,19 @@ int sendEx(Player* pl,const char* buff, int size) {
 }
 int recvEx(Player* pl, char* buff, int size) {
 	int res;
-	res = recv(pl->connect, buff, size, NULL);
+	int i=0;
+	res = recv(pl->connect, buff, size, MSG_PEEK);
+	if (res <= 0) {
+		DeletePlayer(pl);
+		cout << "Disconnet\n";
+		throw "Disconnect";
+	}
+	for (i = 0; i < res; i++) {
+		if (buff[i] == '\0')
+			break;
+	}
+	
+	res = recv(pl->connect, buff,i+1, NULL);
 	if (res <= 0) {
 		DeletePlayer(pl);
 		cout << "Disconnet\n";

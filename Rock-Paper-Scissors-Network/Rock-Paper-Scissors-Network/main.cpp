@@ -35,7 +35,6 @@ void GetNotification(Serwerconnect& sr)
 
 		size=recvEx(sr, sr.Conection, bufer, sizeof(bufer));
 		cout << bufer<<"\n";
-		cout<<size <<"\n";
 	}
 }
 void RoomSesions(char NameR[10],char KeyR[6], Serwerconnect& sr)
@@ -61,7 +60,6 @@ void CreateRoom(Serwerconnect& sr) {
 	cin >> playermax;
 	sendEx(sr, sr.Conection, key, 2);
 	sendEx(sr, sr.Conection, nameroom, strlen(nameroom)+1);
-	Sleep(100);
 	sendEx(sr, sr.Conection, playermax, strlen(playermax) + 1);
 	recvEx(sr, sr.Conection, keyroom, sizeof(keyroom));
 	RoomSesions( nameroom,keyroom,sr);
@@ -177,32 +175,10 @@ int sendEx(Serwerconnect& sr,SOCKET& Connection,const char* buff,int size) {
 	}
 	return result;
 }
-int SearchLen(char* buff, int size,const char* search) {
-	bool searchb = false;
-	int index = 0;
-	int sizes = strlen(search);
-	int i;
-	for (i = 0; i < size; i++) {
-		if (buff[i] == search[index]) {
-			searchb = true;
-			
-			if (sizes == index)
-				break;
-			index++;
-		}
-		else {
-			index = 0;
-			searchb = false;
-		}
-	}
-	if (searchb == true)
-		return i;
-	else
-		return -1;
-}
 int recvEx(Serwerconnect& sr, SOCKET& Connection,char* buff, int size) {
 	int result;
-	result = recv(Connection, buff, size, NULL);
+	int i = 0;
+	result = recv(Connection, buff, size, MSG_PEEK);
 	if (result == SOCKET_ERROR) {
 		printf("send failed: %d\n", WSAGetLastError());
 		closesocket(Connection);
@@ -210,36 +186,18 @@ int recvEx(Serwerconnect& sr, SOCKET& Connection,char* buff, int size) {
 		Connect(sr);
 		return -1;
 	}
-	int index =SearchLen(buff, size, "Len:");
-	if (index != -1) {
-		int i;
-		for (i = index; i < size; i++)
-		{
-			if (buff[i] == ' ')
-				break;
-		}
-		if (i != size) {
-			char* len = new char[i-index];
-			for (int j = index; j < i; j++) {
-				len[j - index] = buff[j];
-			}
-			int leni = atoi(len);
-			delete[] len;
-			if (leni != result) {
-				int raz = result - leni;
-				char* dobor = new char[raz];
-				recv(Connection,dobor,raz,NULL);
-				
-				char* all = new char[leni];
-				strcpy_s(all,result, buff);
-				strcat_s(all,result+raz,dobor);
-				strcpy_s(buff, result + raz,all);
-				delete[] dobor;
-				delete[] all;
-			}
-		}
+	for (i = 0; i < result; i++) {
+		if (buff[i] == '\0')
+			break;
 	}
-	
+	result = recv(Connection, buff,i+1, NULL);
+	if (result == SOCKET_ERROR) {
+		printf("send failed: %d\n", WSAGetLastError());
+		closesocket(Connection);
+		system("cls");
+		Connect(sr);
+		return -1;
+	}
 	return result;
 }
 bool SendIn(Serwerconnect& sr,const char passwordchar[20],const char login[20]) {
@@ -248,7 +206,6 @@ bool SendIn(Serwerconnect& sr,const char passwordchar[20],const char login[20]) 
 	int size_password = strlen(passwordchar)+1;
 	sendEx(sr,sr.Conection, "i", 2);
 	sendEx(sr,sr.Conection, login,strlen(login) + 1);
-	Sleep(100);
 	sendEx(sr,sr.Conection, passwordchar, size_password);
 	recvEx(sr,sr.Conection, temp, sizeof(temp));
 	recvEx(sr,sr.Conection, score, sizeof(score));
@@ -261,7 +218,6 @@ bool SendUp(Serwerconnect& sr, string password, const char login[20]) {
 	char temp[10];
 	sendEx(sr, sr.Conection, "u", 2);
 	sendEx(sr, sr.Conection, login, strlen(login)+1);
-	Sleep(100);
 	sendEx(sr, sr.Conection, password.c_str(), password.length()+1);
 	recvEx(sr, sr.Conection, temp, sizeof(temp));
 	if (strcmp(temp, "ok") == 0)
