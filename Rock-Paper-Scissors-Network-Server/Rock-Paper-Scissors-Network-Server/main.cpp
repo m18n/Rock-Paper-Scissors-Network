@@ -81,9 +81,10 @@ void CreteRoom(Player* pl,Room* r) {
 	char name[10];
 	char maxplayer[4];
 	char keyroom[6];
-	recvEx(pl, name, sizeof(name));
+	int sizename = 0;
+	sizename=recvEx(pl, name, sizeof(name));
 	recvEx(pl, maxplayer, sizeof(maxplayer));
-	CreateRoom(r, atoi(maxplayer), 0, name);
+	CreateRoom(r, atoi(maxplayer), 0, name,sizename);
 	GenertyKey(rm, r);
 	AddRoom(rm, r);
 	AddPlayer(r, pl);

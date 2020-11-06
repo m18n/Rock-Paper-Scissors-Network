@@ -8,10 +8,11 @@ void AddPlayer(Room* rm, Player* pl) {
 		}
 	}
 }
-void CreateRoom(Room* rm, int size, int key, const char name[10]) {
+void CreateRoom(Room* rm, int size, int key, const char name[10],int sizename) {
 	rm->key = key;
 	rm->size = size;
 	rm->online = true;
+	rm->lengthname = sizename;
 	strcpy_s(rm->name, name);
 	rm->pl.resize(size);
 }
