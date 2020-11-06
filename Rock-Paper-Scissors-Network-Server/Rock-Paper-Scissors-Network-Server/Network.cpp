@@ -73,3 +73,36 @@ int recvEx(Player* pl, char* buff, int size) {
 	}
 	return res;
 }
+int sendR(Player* pl, const char* buff, int size) {
+	int res = 0;
+	res = send(pl->connect, buff, size, NULL);
+	if (res < 0) {
+		DeletePlayer(pl);
+		cout << "Disconnet\n";
+		return -1;
+	}
+
+	return res;
+}
+int recvR(Player* pl, char* buff, int size) {
+	int res;
+	int i = 0;
+	res = recv(pl->connect, buff, size, MSG_PEEK);
+	if (res <= 0) {
+		DeletePlayer(pl);
+		cout << "Disconnet\n";
+		return -1;
+	}
+	for (i = 0; i < res; i++) {
+		if (buff[i] == '\0')
+			break;
+	}
+
+	res = recv(pl->connect, buff, i + 1, NULL);
+	if (res <= 0) {
+		DeletePlayer(pl);
+		cout << "Disconnet\n";
+		return -1;
+	}
+	return res;
+}

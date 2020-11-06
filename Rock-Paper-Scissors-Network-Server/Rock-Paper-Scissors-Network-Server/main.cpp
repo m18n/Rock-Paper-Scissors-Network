@@ -55,10 +55,77 @@ bool SingIn(Player* pl, char password[20]) {
 int SearchRoom(int keyroom) {
 	for (int i = 0; i < rm.size(); i++)
 	{
-		if (rm[i]->key == keyroom) {
+		if (rm[i]->intkey == keyroom) {
 			return i;
 		}
 	}
+}
+void SendRoom(Player* pl,Room* r) {
+	sendR(pl,r->name, r->lengthname);
+	sendR(pl,r->key,strlen(r->key));
+	sendR(pl,pleyer);
+}
+int NumberRoomName(char name[10], int sizename) {
+	int index = 0;
+	int i = 0;
+	int num = 0;
+	while (i != rm.size()) {
+		if (rm[i]->online == true) {
+			if (rm[i]->lengthname >= sizename) {
+				if (rm[i]->name[index] == name[index]) {
+					index++;
+					if (sizename == index)
+					{
+						num++;
+						i++;
+						index = 0;
+					}
+				}
+				else
+					i++;
+			}
+			else
+				i++;
+		}
+		else
+			i++;
+
+	}
+	return num;
+}
+void SearchRoomName(Player* pl,char name[10], int sizename) {
+	int index = 0;
+	int i = 0;
+	int num = NumberRoomName(name, sizename);
+	try {
+		sendEx(pl,to_string(num).c_str(),to_string(num).size());
+	}
+	catch (...) {
+		return;
+	}
+	while (i != rm.size()) {
+		if (rm[i]->online == true) {
+			if (rm[i]->lengthname >= sizename) {
+				if (rm[i]->name[index] == name[index]) {
+					index++;
+					if (sizename == index)
+					{
+						SendRoom(pl, rm[i]);
+						i++;
+						index = 0;
+					}
+				}
+				else
+					i++;
+			}
+			else
+				i++;
+		}
+		else
+			i++;
+		
+	}
+
 }
 int NumberPlayerRoom(Room* r) {
 	int player = 0;
@@ -69,13 +136,20 @@ int NumberPlayerRoom(Room* r) {
 	}
 	return player;
 }
-void ConnectRoom(Player* pl, Room** r) {
+bool ConnectRoom(Player* pl, Room** r) {
 	char keyroom[6];
-	recvEx(pl, keyroom, sizeof(keyroom));
-	*r = rm[SearchRoom(atoi(keyroom))];
-	sendEx(pl, (*r)->name, strlen((*r)->name)+1);
+	try {
+		recvEx(pl, keyroom, sizeof(keyroom));
+		*r = rm[SearchRoom(atoi(keyroom))];
+		sendEx(pl, (*r)->name, strlen((*r)->name) + 1);
+	}
+	catch (...) {
+		return false;
+	}
 	AddPlayer(*r, pl);
-	int pler = NumberPlayerRoom(*r);
+	pl->room = *r;
+	(*r)->onlineplayer++;
+	return true;
 }
 void CreteRoom(Player* pl,Room* r) {
 	char name[10];
@@ -140,17 +214,23 @@ void Menu(Player* pl) {
 			CreteRoom(pl,r);
 		}
 		else if (key[0] == 's') {//search
+			char name[10];
+			Room* r = NULL;
+			int sizename=recvEx(pl, name, sizeof(name));
+			int index=SearchRoomName(name,sizename);
+			if(index==-1)
 
 		}
 		else if (key[0] == 'c') {//connect
 			Room* r=NULL;
-			ConnectRoom(pl,&r);
+			bool conn=ConnectRoom(pl,&r);
+			if (conn == false)
+				return;
 			bool temp=false;
 			while (temp != true) {
 				temp = Notification(r);
 			}
-			int player = NumberPlayerRoom(r);
-			cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << r->size << " Player: " << player << "\n";
+			cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << r->size << " Player: " << r->onlineplayer << "\n";
 		}
 	}
 	catch (...)

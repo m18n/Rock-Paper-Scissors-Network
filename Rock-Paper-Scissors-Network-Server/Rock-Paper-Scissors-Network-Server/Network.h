@@ -14,6 +14,8 @@ struct Connect {
 	int sizeofaddr = 0;
 };
 int recvEx(Player* pl, char* buff, int size);
+int recvR(Player* pl, char* buff, int size);
 int sendEx(Player* pl, const char* buff, int size);
+int sendR(Player* pl, const char* buff, int size);
 void Inithilization(Connect& cn, string ip, short int port);
 void ConnectSocket(Connect& cn, vector<Player*>& conn, void(*Handle)(Player* pl));

@@ -1,6 +1,7 @@
 #pragma once
 #include"iostream"
 #include"Player.h"
+#include<string>
 #include<vector>
 #include"time.h"
 using namespace std;
@@ -8,7 +9,9 @@ struct Room {
 	char name[10];
 	int lengthname=0;
 	vector<Player*>pl;
-	int key=0;
+	char key[6];
+	int onlineplayer = 0;
+	int intkey = 0;
 	int size=0;
 	bool online = false;
 };

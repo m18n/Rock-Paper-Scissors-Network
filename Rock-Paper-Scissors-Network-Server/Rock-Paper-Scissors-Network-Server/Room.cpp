@@ -9,7 +9,8 @@ void AddPlayer(Room* rm, Player* pl) {
 	}
 }
 void CreateRoom(Room* rm, int size, int key, const char name[10],int sizename) {
-	rm->key = key;
+	rm->intkey = key;
+	strcpy_s(rm->key, to_string(key).c_str());
 	rm->size = size;
 	rm->online = true;
 	rm->lengthname = sizename;
@@ -20,15 +21,16 @@ void GenertyKey(vector<Room*>& rm, Room* r) {
 	srand(time(0));
 	int key = rand() % 10000;
 	for (int i = 0; i < rm.size(); i++) {
-		if (rm[i]->key == key) {
+		if (rm[i]->intkey == key) {
 			key = rand() % 10000;
 			i = 0;
 		}
 	}
-	r->key = key;
+	r->intkey = key;
+	strcpy_s(r->key,to_string(key).c_str());
 }
 void DeleteRoom(Room* rm) {
-	rm->key = 0;
+	rm->intkey = 0;
 	rm->size = 0;
 	for (int i = 0; i < rm->pl.size(); i++) {
 		DeletePlayer(rm->pl[i]);
