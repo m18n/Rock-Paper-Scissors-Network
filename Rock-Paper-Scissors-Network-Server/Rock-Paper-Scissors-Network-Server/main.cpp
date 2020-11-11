@@ -299,6 +299,8 @@ void Meneger(Player* pl) {
 			return;
 	}
 	Menu(pl);
+	DeletePlayer(pl);
+	cout << "Disconnet\n";
 }
 int main() {
 	vector<Player*>conn;
