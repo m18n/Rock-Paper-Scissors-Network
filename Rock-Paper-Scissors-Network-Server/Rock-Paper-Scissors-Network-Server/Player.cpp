@@ -1,9 +1,9 @@
 #include "Player.h"
 void DeletePlayer(Player* pl) {
-	if (pl->room != NULL)
-		pl->room->onlineplayer--;
+	if (pl->roome != NULL)
+		pl->roome->onlineplayer--;
 	pl->online = false;
 	pl->ready = false;
-	pl->room = NULL;
+	pl->roome = NULL;
 	closesocket(pl->connect);
 }

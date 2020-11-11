@@ -1,4 +1,5 @@
 #define WIN32_LEAN_AND_MEAN
+#pragma once
 #include<iostream>
 #include<vector>
 #include<WinSock2.h>
@@ -6,10 +7,10 @@
 #include"string"
 #pragma warning(disable:4996)
 #pragma comment(lib,"ws2_32.lib")
-#include"Player.h"
+#include"Room.h"
 #include"string.h"
 #include"Network.h"
-#include"Room.h"
+
 using namespace std;
 vector<Room*>rm;
 bool SingIn(Player* pl, char password[20]) {
@@ -26,9 +27,9 @@ bool SingIn(Player* pl, char password[20]) {
 	}
 	if (temp2 != pl->login) {
 		strcpy_s(temp, "Error");
-		sendEx(pl, temp, strlen(temp) + 1);
+		sendEx(pl, temp, (int)strlen(temp) + 1);
 		strcpy_s(temp, "");
-		sendEx(pl, temp, strlen(temp) + 1);
+		sendEx(pl, temp, (int)strlen(temp) + 1);
 	}
 	else {
 		fi >> temp2;
@@ -46,8 +47,8 @@ bool SingIn(Player* pl, char password[20]) {
 			strcpy_s(temp, "ok");
 			suc = true;
 		}
-		sendEx(pl, temp, strlen(temp) + 1);
-		sendEx(pl, score, strlen(score) + 1);
+		sendEx(pl, temp, (int)strlen(temp) + 1);
+		sendEx(pl, score, (int)strlen(score) + 1);
 	}
 	fi.close();
 	return suc;
@@ -60,10 +61,18 @@ int SearchRoom(int keyroom) {
 		}
 	}
 }
-void SendRoom(Player* pl,Room* r) {
-	sendR(pl,r->name, r->lengthname);
-	sendR(pl,r->key,strlen(r->key));
-	sendR(pl,pleyer);
+int SendRoom(Player* pl,Room* r) {
+	try
+	{
+		sendEx(pl, r->name, r->lengthname);
+		sendEx(pl, r->key, (int)strlen(r->key) + 1);
+		sendEx(pl, to_string(r->onlineplayer).c_str(), (int)to_string(r->onlineplayer).length() + 1);
+	}
+	catch (...)
+	{
+		return -1;
+	}
+	return 0;
 }
 int NumberRoomName(char name[10], int sizename) {
 	int index = 0;
@@ -71,10 +80,10 @@ int NumberRoomName(char name[10], int sizename) {
 	int num = 0;
 	while (i != rm.size()) {
 		if (rm[i]->online == true) {
-			if (rm[i]->lengthname >= sizename) {
+			if (rm[i]->lengthname-1 >= sizename-1) {
 				if (rm[i]->name[index] == name[index]) {
 					index++;
-					if (sizename == index)
+					if (sizename-1 == index)
 					{
 						num++;
 						i++;
@@ -93,24 +102,27 @@ int NumberRoomName(char name[10], int sizename) {
 	}
 	return num;
 }
-void SearchRoomName(Player* pl,char name[10], int sizename) {
+int SearchRoomName(Player* pl,char name[10], int sizename) {
 	int index = 0;
 	int i = 0;
+	int error = 0;
 	int num = NumberRoomName(name, sizename);
 	try {
-		sendEx(pl,to_string(num).c_str(),to_string(num).size());
+		sendEx(pl,to_string(num).c_str(), (int)to_string(num).size());
 	}
 	catch (...) {
-		return;
+		return -1;
 	}
 	while (i != rm.size()) {
 		if (rm[i]->online == true) {
-			if (rm[i]->lengthname >= sizename) {
+			if (rm[i]->lengthname-1 >= sizename-1) {
 				if (rm[i]->name[index] == name[index]) {
 					index++;
-					if (sizename == index)
+					if (sizename-1 == index)
 					{
-						SendRoom(pl, rm[i]);
+						error=SendRoom(pl, rm[i]);
+						if (error == -1)
+							return -1;
 						i++;
 						index = 0;
 					}
@@ -125,7 +137,7 @@ void SearchRoomName(Player* pl,char name[10], int sizename) {
 			i++;
 		
 	}
-
+	return 0;
 }
 int NumberPlayerRoom(Room* r) {
 	int player = 0;
@@ -141,29 +153,27 @@ bool ConnectRoom(Player* pl, Room** r) {
 	try {
 		recvEx(pl, keyroom, sizeof(keyroom));
 		*r = rm[SearchRoom(atoi(keyroom))];
-		sendEx(pl, (*r)->name, strlen((*r)->name) + 1);
+		sendEx(pl, (*r)->name, (int)strlen((*r)->name) + 1);
 	}
 	catch (...) {
 		return false;
 	}
-	AddPlayer(*r, pl);
-	pl->room = *r;
+	AddPlayer(*r,pl);
+	pl->roome = *r;
 	(*r)->onlineplayer++;
 	return true;
 }
 void CreteRoom(Player* pl,Room* r) {
 	char name[10];
 	char maxplayer[4];
-	char keyroom[6];
 	int sizename = 0;
 	sizename=recvEx(pl, name, sizeof(name));
 	recvEx(pl, maxplayer, sizeof(maxplayer));
 	CreateRoom(r, atoi(maxplayer), 0, name,sizename);
 	GenertyKey(rm, r);
 	AddRoom(rm, r);
-	AddPlayer(r, pl);
-	strcpy_s(keyroom, to_string(r->key).c_str());
-	sendEx(pl, keyroom, strlen(keyroom)+1);
+	AddPlayer(&(*r), pl);
+	sendEx(pl, r->key, (int)strlen(r->key)+1);
 	cout << "Room: " << r->key << " Name: " << r->name << " Maxplayer: " << maxplayer << "\n";
 }
 bool Notification(Room* r) {
@@ -178,7 +188,7 @@ bool Notification(Room* r) {
 		for (int i = 0; i < r->size; i++) {
 			if (r->pl[i] != NULL && r->pl[i]->online == true) {
 				index = i;
-				size=sendEx(r->pl[i], maxplayer, strlen(maxplayer) + 1);
+				size=sendEx(r->pl[i], maxplayer, (int)strlen(maxplayer) + 1);
 				cout << "Size: " << size<<"\n";
 				for (int j = 0; j < r->size; j++) {
 					if (r->pl[j] != NULL && r->pl[j]->online == true) {
@@ -190,7 +200,7 @@ bool Notification(Room* r) {
 						else
 							strcat(buff, "false");
 						index = i;
-						size=sendEx(r->pl[i],buff,strlen(buff)+1);
+						size=sendEx(r->pl[i],buff, (int)strlen(buff)+1);
 						cout << "Size: " << size << "\n";
 					}
 				}
@@ -217,9 +227,9 @@ void Menu(Player* pl) {
 			char name[10];
 			Room* r = NULL;
 			int sizename=recvEx(pl, name, sizeof(name));
-			int index=SearchRoomName(name,sizename);
-			if(index==-1)
-
+			SearchRoomName(pl,name,sizename);
+			
+			
 		}
 		else if (key[0] == 'c') {//connect
 			Room* r=NULL;
@@ -259,7 +269,7 @@ bool SingUp(Player* pl, char password[20]) {
 		fi.close();
 		suc = true;
 	}
-	sendEx(pl, temp, strlen(temp) + 1);
+	sendEx(pl, temp, (int)strlen(temp) + 1);
 	return suc;
 }
 int Login(Player* pl) {
@@ -295,7 +305,7 @@ int main() {
 
 	cout << "start server\n";
 	Connect cn;
-	Inithilization(cn, "192.168.0.102", 9999);
+	Inithilization(cn, "192.168.0.100", 9999);
 	ConnectSocket(cn, conn, Meneger);
 	system("pause");
 	return 0;

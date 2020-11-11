@@ -80,7 +80,25 @@ void ConnectRoom(Serwerconnect& sr) {
 void SearchRoom(Serwerconnect& sr) {
 	char key[2];
 	key[0] = 's';
-	sendEx(sr, sr.Conection, key, 2);
+	char maxnum[6];//max name room
+	int max = 0;
+	char keyroom[6];
+	char onlineplayer[10];
+	char nameroom[10];
+	cout << "Name search: \n";
+	cin.ignore();
+	gets_s(nameroom);
+	sendEx(sr, sr.Conection, key,2);
+	sendEx(sr, sr.Conection, nameroom,sizeof(nameroom));
+	recvEx(sr, sr.Conection, maxnum, sizeof(maxnum));
+	cout << "\n";
+	max = atoi(maxnum);
+	for (int i = 0; i < max; i++) {
+		recvEx(sr, sr.Conection,nameroom,sizeof(nameroom));
+		recvEx(sr, sr.Conection,keyroom,sizeof(keyroom));
+		recvEx(sr, sr.Conection,onlineplayer,sizeof(onlineplayer));
+		cout << "Name: " << nameroom << " Keyroom: " << keyroom << " Online Player: " << onlineplayer<<"\n";
+	}
 }
 void MenuRoom(Serwerconnect& sr)
 {
@@ -99,6 +117,7 @@ void MenuRoom(Serwerconnect& sr)
 		CreateRoom(sr);
 		break;
 	case 1://Search Room
+		
 		SearchRoom(sr);
 		break;
 	case 2://Connect Room
