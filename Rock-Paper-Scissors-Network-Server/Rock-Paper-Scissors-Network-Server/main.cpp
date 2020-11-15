@@ -307,7 +307,7 @@ int main() {
 
 	cout << "start server\n";
 	Connect cn;
-	Inithilization(cn, "192.168.0.100", 9999);
+	Inithilization(cn, "192.168.0.103", 9999);
 	ConnectSocket(cn, conn, Meneger);
 	system("pause");
 	return 0;
